@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, SlidersHorizontal, Frown } from 'lucide-react'
+import { Search, SlidersHorizontal, Frown, X } from 'lucide-react'
 import SkillCard from '../components/SkillCard'
 import { sampleMentors, categories, districts, experienceLevels } from '../data/sampleData'
 
@@ -8,14 +8,22 @@ function Explore() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [selectedLevel, setSelectedLevel] = useState('')
+  const [sortBy, setSortBy] = useState('relevance')
 
   // Requirement #6: Display, search, filter information
   const filteredMentors = useMemo(() => {
-    return sampleMentors.filter(mentor => {
-      const matchesSearch = searchQuery === '' ||
-        mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        mentor.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const searchTerms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean)
+    const results = sampleMentors.filter(mentor => {
+      const searchableContent = [
+        mentor.name,
+        mentor.skill,
+        mentor.category,
+        mentor.district,
+        mentor.experienceLevel,
+        mentor.description,
+        ...mentor.availability
+      ].join(' ').toLowerCase()
+      const matchesSearch = searchTerms.every(term => searchableContent.includes(term))
 
       const matchesCategory = selectedCategory === '' || mentor.category === selectedCategory
       const matchesDistrict = selectedDistrict === '' || mentor.district === selectedDistrict
@@ -23,16 +31,38 @@ function Explore() {
 
       return matchesSearch && matchesCategory && matchesDistrict && matchesLevel
     })
-  }, [searchQuery, selectedCategory, selectedDistrict, selectedLevel])
+
+    return [...results].sort((firstMentor, secondMentor) => {
+      if (sortBy === 'rating') return secondMentor.rating - firstMentor.rating
+      if (sortBy === 'students') return secondMentor.studentsHelped - firstMentor.studentsHelped
+      if (sortBy === 'newest') return new Date(secondMentor.createdAt) - new Date(firstMentor.createdAt)
+      if (searchTerms.length === 0) return 0
+
+      const score = (mentor) => searchTerms.reduce((total, term) => {
+        const nameMatch = mentor.name.toLowerCase().includes(term)
+        const skillMatch = mentor.skill.toLowerCase().includes(term)
+        const categoryMatch = mentor.category.toLowerCase().includes(term)
+        return total + (nameMatch ? 4 : 0) + (skillMatch ? 3 : 0) + (categoryMatch ? 2 : 0)
+      }, 0)
+      return score(secondMentor) - score(firstMentor)
+    })
+  }, [searchQuery, selectedCategory, selectedDistrict, selectedLevel, sortBy])
 
   const clearFilters = () => {
     setSearchQuery('')
     setSelectedCategory('')
     setSelectedDistrict('')
     setSelectedLevel('')
+    setSortBy('relevance')
   }
 
-  const hasActiveFilters = searchQuery || selectedCategory || selectedDistrict || selectedLevel
+  const activeFilters = [
+    searchQuery ? `Search: ${searchQuery}` : '',
+    selectedCategory,
+    selectedDistrict,
+    selectedLevel
+  ].filter(Boolean)
+  const hasActiveFilters = activeFilters.length > 0
 
   return (
     <main className="explore-page" id="explore-page">
@@ -61,6 +91,7 @@ function Explore() {
               />
             </div>
 
+            <label className="sr-only" htmlFor="filter-category">Filter by category</label>
             <select
               className="filter-select"
               value={selectedCategory}
@@ -73,6 +104,7 @@ function Explore() {
               ))}
             </select>
 
+            <label className="sr-only" htmlFor="filter-district">Filter by district</label>
             <select
               className="filter-select"
               value={selectedDistrict}
@@ -85,6 +117,7 @@ function Explore() {
               ))}
             </select>
 
+            <label className="sr-only" htmlFor="filter-level">Filter by experience level</label>
             <select
               className="filter-select"
               value={selectedLevel}
@@ -96,6 +129,19 @@ function Explore() {
                 <option key={level} value={level}>{level}</option>
               ))}
             </select>
+
+            <label className="sr-only" htmlFor="sort-results">Sort mentors</label>
+            <select
+              className="filter-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              id="sort-results"
+            >
+              <option value="relevance">Sort: Relevance</option>
+              <option value="rating">Sort: Highest rated</option>
+              <option value="students">Sort: Most experienced</option>
+              <option value="newest">Sort: Newest profiles</option>
+            </select>
           </div>
         </div>
 
@@ -103,22 +149,14 @@ function Explore() {
         <div className="results-count" id="results-count">
           Showing <span>{filteredMentors.length}</span> of {sampleMentors.length} mentors
           {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="btn btn-sm"
-              style={{
-                marginLeft: 12,
-                padding: '4px 14px',
-                fontSize: '0.8rem',
-                background: 'var(--bg-card)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-glass)',
-                borderRadius: 'var(--radius-full)'
-              }}
-              id="clear-filters-btn"
-            >
-              Clear filters
-            </button>
+            <>
+              <div className="active-filter-list" aria-label="Active filters">
+                {activeFilters.map(filter => <span className="active-filter" key={filter}>{filter}</span>)}
+              </div>
+              <button onClick={clearFilters} className="btn btn-sm clear-filters-button" id="clear-filters-btn">
+                <X size={14} /> Clear filters
+              </button>
+            </>
           )}
         </div>
 
