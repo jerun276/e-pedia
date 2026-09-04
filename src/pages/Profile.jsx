@@ -3,19 +3,27 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { AlertCircle, Award, ArrowLeft, BadgeCheck, CheckCircle, MapPin, Send, Star, Users, Clock, Mail, Phone, MessageCircle, X } from 'lucide-react'
 import { sampleMentors } from '../data/sampleData'
 import { db, isFirebaseConfigured } from '../firebase/config'
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { useAuth } from '../firebase/AuthContext'
 
 function Profile() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { userProfile } = useAuth()
   
   const [mentor, setMentor] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const findMentor = async () => {
+      let isMe = id === 'me';
+      let searchEmail = isMe && userProfile ? userProfile.email : null;
+      let found = null;
+      
       // 1. Check sampleMentors
-      let found = sampleMentors.find(m => m.id === id)
+      if (!isMe) {
+        found = sampleMentors.find(m => m.id === id)
+      }
       
       // 2. Check localStorage
       if (!found) {
@@ -23,7 +31,11 @@ function Profile() {
           const stored = localStorage.getItem('epedia_custom_mentors')
           if (stored) {
             const parsed = JSON.parse(stored)
-            found = parsed.find(m => m.id === id || m.uid === id)
+            if (isMe && searchEmail) {
+              found = parsed.find(m => m.email === searchEmail)
+            } else {
+              found = parsed.find(m => m.id === id || m.uid === id)
+            }
           }
         } catch (e) {
           console.warn('Error reading cached mentors:', e)
@@ -33,14 +45,22 @@ function Profile() {
       // 3. Check Firestore
       if (!found && isFirebaseConfigured && db) {
         try {
-          const docRef = doc(db, 'mentors', id)
-          const docSnap = await getDoc(docRef)
-          if (docSnap.exists()) {
-            found = { id: docSnap.id, ...docSnap.data() }
-          } else {
-            const snapshot = await getDocs(collection(db, 'mentors'))
-            const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-            found = docs.find(m => m.id === id || m.uid === id)
+          if (isMe && searchEmail) {
+            const q = query(collection(db, 'mentors'), where('email', '==', searchEmail))
+            const snap = await getDocs(q)
+            if (!snap.empty) {
+              found = { id: snap.docs[0].id, ...snap.docs[0].data() }
+            }
+          } else if (!isMe) {
+            const docRef = doc(db, 'mentors', id)
+            const docSnap = await getDoc(docRef)
+            if (docSnap.exists()) {
+              found = { id: docSnap.id, ...docSnap.data() }
+            } else {
+              const snapshot = await getDocs(collection(db, 'mentors'))
+              const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+              found = docs.find(m => m.id === id || m.uid === id)
+            }
           }
         } catch (e) {
           console.warn('Firestore fetch mentor warning:', e.message)
@@ -51,8 +71,13 @@ function Profile() {
       setLoading(false)
     }
     
+    // Wait for userProfile if id is 'me'
+    if (id === 'me' && userProfile === undefined) {
+      return; 
+    }
+    
     findMentor()
-  }, [id])
+  }, [id, userProfile])
 
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [contactSent, setContactSent] = useState(false)
@@ -164,7 +189,9 @@ function Profile() {
 
           {/* Profile Header */}
           <div className="profile-header-card glass-card" id="profile-header">
-            <div className="profile-avatar">{mentor.avatar}</div>
+            <div className="profile-avatar">
+              <img src={mentor.avatar} alt={mentor.name} />
+            </div>
             <div className="profile-info">
               <h1>{mentor.name}</h1>
               <p className="profile-skill">{mentor.skill}</p>

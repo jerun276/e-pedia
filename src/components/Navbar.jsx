@@ -40,7 +40,7 @@ function Navbar() {
 
   const getInitials = (name) => {
     if (!name) return 'U'
-    const parts = name.trim().split(' ')
+    const parts = name.trim().split(/\s+/).filter(Boolean)
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase()
     }
@@ -235,7 +235,7 @@ function Navbar() {
                     {/* Navigation Items */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <Link
-                        to={`/profile/${userProfile?.uid || 'me'}`}
+                        to="/profile/me"
                         onClick={() => setDropdownOpen(false)}
                         style={{
                           display: 'flex',
@@ -437,7 +437,7 @@ function Navbar() {
         {isLoggedIn && (
           <>
             <NavLink
-              to={`/profile/${userProfile?.uid || 'me'}`}
+              to="/profile/me"
               onClick={() => setMobileOpen(false)}
             >
               My Profile & ID Card
