@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { AlertCircle, Award, ArrowLeft, BadgeCheck, CheckCircle, MapPin, Send, Star, Users, Clock, Mail, Phone, MessageCircle, X } from 'lucide-react'
 import { sampleMentors } from '../data/sampleData'
 import { db, isFirebaseConfigured } from '../firebase/config'
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
+import { doc, getDoc, collection, getDocs, query, where, addDoc, serverTimestamp } from 'firebase/firestore'
 import { useAuth } from '../firebase/AuthContext'
 
 function Profile() {
@@ -79,11 +79,7 @@ function Profile() {
     findMentor()
   }, [id, userProfile])
 
-  const [isContactOpen, setIsContactOpen] = useState(false)
-  const [contactSent, setContactSent] = useState(false)
-  const [contactData, setContactData] = useState({ name: '', email: '', message: '' })
-  const [contactErrors, setContactErrors] = useState({})
-  
+
   const [reviews, setReviews] = useState([])
   
   useEffect(() => {
@@ -221,25 +217,71 @@ function Profile() {
     : mentor.rating
   const isTopMentor = Number(averageRating) >= 4.8 && mentor.studentsHelped >= 20
 
-  const openContact = () => {
-    setContactSent(false)
-    setContactErrors({})
-    setIsContactOpen(true)
-  }
+  const [isMessaging, setIsMessaging] = useState(false)
 
-  const closeContact = () => {
-    setIsContactOpen(false)
-    setContactSent(false)
-  }
+  const handleMessageMentor = async () => {
+    if (!userProfile) {
+      navigate('/login')
+      return
+    }
+    
+    // Can't message yourself
+    if (userProfile.uid === mentor.uid || userProfile.email === mentor.email) {
+      alert("You can't message yourself.")
+      return
+    }
 
-  const handleContactSubmit = (event) => {
-    event.preventDefault()
-    const errors = {}
-    if (!contactData.name.trim()) errors.name = 'Please enter your name'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactData.email)) errors.email = 'Please enter a valid email address'
-    if (contactData.message.trim().length < 10) errors.message = 'Please write at least 10 characters'
-    setContactErrors(errors)
-    if (Object.keys(errors).length === 0) setContactSent(true)
+    setIsMessaging(true)
+    try {
+      if (isFirebaseConfigured && db) {
+        // Check if chat already exists
+        const q = query(
+          collection(db, 'chats'),
+          where('participants', 'array-contains', userProfile.uid)
+        )
+        const snap = await getDocs(q)
+        
+        // Firestore doesn't support 'array-contains-all', so filter manually
+        let existingChatId = null
+        snap.forEach(doc => {
+          const data = doc.data()
+          if (data.participants && data.participants.includes(mentor.uid || mentor.id)) {
+            existingChatId = doc.id
+          }
+        })
+
+        if (existingChatId) {
+          navigate(`/messages?chatId=${existingChatId}`)
+        } else {
+          // Create new chat
+          const mentorId = mentor.uid || mentor.id
+          const newChatData = {
+            participants: [userProfile.uid, mentorId],
+            participantDetails: {
+              [userProfile.uid]: {
+                name: userProfile.name,
+                avatar: userProfile.avatar || null
+              },
+              [mentorId]: {
+                name: mentor.name,
+                avatar: mentor.avatar || null
+              }
+            },
+            updatedAt: serverTimestamp(),
+            lastMessage: ''
+          }
+          const docRef = await addDoc(collection(db, 'chats'), newChatData)
+          navigate(`/messages?chatId=${docRef.id}`)
+        }
+      } else {
+        alert("Firebase is not configured for chats. Please enable it.")
+      }
+    } catch (error) {
+      console.error("Error initiating chat:", error)
+      alert("Failed to start conversation. Please try again.")
+    } finally {
+      setIsMessaging(false)
+    }
   }
 
   const handleReviewSubmit = (event) => {
@@ -336,9 +378,18 @@ function Profile() {
                 <h2 id="communication-heading">Connect with {mentor.name.split(' ')[0]}</h2>
                 <p>Ask about lessons, availability, or a learning plan.</p>
               </div>
-              <button className="btn btn-accent" onClick={openContact} id="contact-mentor-btn">
-                {contactIcons[mentor.contactMethod]}
-                Send an inquiry
+              <button 
+                className="btn btn-accent" 
+                onClick={handleMessageMentor} 
+                id="contact-mentor-btn"
+                disabled={isMessaging}
+              >
+                {isMessaging ? 'Starting chat...' : (
+                  <>
+                    <MessageCircle size={16} />
+                    Message Mentor
+                  </>
+                )}
               </button>
             </div>
           </section>
@@ -392,32 +443,7 @@ function Profile() {
             )}
           </section>
 
-          {isContactOpen && (
-            <div className="modal-overlay" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeContact()}>
-              <div className="modal-content contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
-                <button className="modal-close" onClick={closeContact} aria-label="Close inquiry form"><X size={20} /></button>
-                {contactSent ? (
-                  <>
-                    <div className="modal-icon"><CheckCircle size={34} /></div>
-                    <h2>Inquiry sent</h2>
-                    <p>{mentor.name.split(' ')[0]} can now follow up through {mentor.contactMethod}.</p>
-                    <button className="btn btn-primary" onClick={closeContact}>Done</button>
-                  </>
-                ) : (
-                  <>
-                    <h2 id="contact-modal-title">Message {mentor.name.split(' ')[0]}</h2>
-                    <p>Send a short inquiry and explain what you would like to learn.</p>
-                    <form onSubmit={handleContactSubmit} noValidate>
-                      <div className="form-group"><label className="form-label" htmlFor="contact-name">Your name</label><input className={`form-input ${contactErrors.name ? 'error' : ''}`} id="contact-name" value={contactData.name} onChange={(event) => setContactData({ ...contactData, name: event.target.value })} />{contactErrors.name && <div className="form-error"><AlertCircle size={14} /> {contactErrors.name}</div>}</div>
-                      <div className="form-group"><label className="form-label" htmlFor="contact-email">Email address</label><input type="email" className={`form-input ${contactErrors.email ? 'error' : ''}`} id="contact-email" value={contactData.email} onChange={(event) => setContactData({ ...contactData, email: event.target.value })} />{contactErrors.email && <div className="form-error"><AlertCircle size={14} /> {contactErrors.email}</div>}</div>
-                      <div className="form-group"><label className="form-label" htmlFor="contact-message">Your message</label><textarea className={`form-textarea ${contactErrors.message ? 'error' : ''}`} id="contact-message" value={contactData.message} onChange={(event) => setContactData({ ...contactData, message: event.target.value })} placeholder="I would like to learn..." />{contactErrors.message && <div className="form-error"><AlertCircle size={14} /> {contactErrors.message}</div>}</div>
-                      <button className="btn btn-accent form-submit" type="submit"><Send size={17} /> Send inquiry</button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+
         </div>
       </div>
     </main>

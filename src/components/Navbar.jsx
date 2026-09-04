@@ -248,10 +248,32 @@ function Navbar() {
                           fontWeight: 500,
                           transition: 'background 0.2s ease'
                         }}
-                        className="dropdown-item"
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                       >
-                        <User size={16} className="text-primary" />
-                        <span>My Profile & ID Card</span>
+                        <User size={16} style={{ color: 'var(--text-secondary)' }} />
+                        My Profile & ID Card
+                      </Link>
+
+                      <Link
+                        to="/messages"
+                        onClick={() => setDropdownOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          borderRadius: '8px',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.88rem',
+                          fontWeight: 500,
+                          transition: 'background 0.2s ease'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <MessageCircle size={16} style={{ color: 'var(--text-secondary)' }} />
+                        Messages
                       </Link>
 
                       {isTeacher && (
@@ -443,6 +465,13 @@ function Navbar() {
               My Profile & ID Card
             </NavLink>
 
+            <NavLink
+              to="/messages"
+              onClick={() => setMobileOpen(false)}
+            >
+              Messages
+            </NavLink>
+            
             {isTeacher && (
               <NavLink
                 to="/teach"

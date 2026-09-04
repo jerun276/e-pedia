@@ -13,6 +13,7 @@ import Profile from './pages/Profile'
 import AiQuiz from './pages/AiQuiz'
 import AdminDashboard from './pages/AdminDashboard'
 import Auth from './pages/Auth'
+import Messages from './pages/Messages'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -44,6 +45,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AiQuiz />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Messages />
             </ProtectedRoute>
           }
         />
