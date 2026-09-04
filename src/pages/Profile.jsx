@@ -16,7 +16,7 @@ function Profile() {
 
   useEffect(() => {
     const findMentor = async () => {
-      let isMe = id === 'me';
+      let isMe = id === 'me' || (userProfile && id === userProfile.uid);
       let searchEmail = isMe && userProfile ? userProfile.email : null;
       let found = null;
       
@@ -109,6 +109,90 @@ function Profile() {
   }
 
   if (!mentor) {
+    if ((id === 'me' || id === userProfile?.uid) && userProfile) {
+      const isTeacher = userProfile.role === 'teacher' || userProfile.email?.includes('teacher')
+      const isAdmin = userProfile.role === 'admin' || userProfile.email?.includes('admin')
+      
+      const getInitials = (name) => {
+        if (!name) return 'U'
+        const parts = name.trim().split(/\s+/).filter(Boolean)
+        if (parts.length >= 2) {
+          return (parts[0][0] + parts[1][0]).toUpperCase()
+        }
+        return name.slice(0, 2).toUpperCase()
+      }
+
+      return (
+        <main className="profile-page" id="profile-page">
+          <div className="container">
+            <div className="profile-container" style={{ maxWidth: '600px', margin: '0 auto' }}>
+              <button
+                onClick={() => navigate(-1)}
+                className="btn btn-secondary btn-sm"
+                style={{ marginBottom: 24 }}
+              >
+                <ArrowLeft size={16} /> Back
+              </button>
+
+              <div className="profile-header-card glass-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+                <div 
+                  className="profile-avatar"
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    background: isAdmin
+                      ? 'linear-gradient(135deg, #FF5252, #FF7979)'
+                      : isTeacher
+                      ? 'linear-gradient(135deg, var(--secondary), #00B894)'
+                      : 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '3rem',
+                    margin: '0 auto 24px auto',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)'
+                  }}
+                >
+                  {getInitials(userProfile.name)}
+                </div>
+                <h2 style={{ fontSize: '2rem', marginBottom: 8 }}>{userProfile.name}</h2>
+                <p className="profile-skill" style={{ marginBottom: 24, fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                  {userProfile.email}
+                </p>
+                <div className="profile-badges" style={{ justifyContent: 'center' }}>
+                  <span className="mentor-badge category" style={{ fontSize: '0.9rem', padding: '6px 16px' }}>
+                    {isAdmin ? 'ADMINISTRATOR' : isTeacher ? 'TEACHER' : 'LEARNER'}
+                  </span>
+                  {userProfile.verified && (
+                    <span className="mentor-badge verified-badge" style={{ fontSize: '0.9rem', padding: '6px 16px' }}>
+                      <BadgeCheck size={16} style={{ marginRight: 6 }} /> Verified
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <div className="profile-details glass-card" style={{ marginTop: 24, textAlign: 'center', padding: '32px' }}>
+                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                  You are currently signed in as a <strong style={{ color: 'var(--text-primary)' }}>{isAdmin ? 'System Administrator' : isTeacher ? 'Teacher' : 'Student'}</strong>.
+                </p>
+                {!isTeacher && !isAdmin && (
+                  <div style={{ marginTop: 32 }}>
+                    <p style={{ marginBottom: 16, color: 'var(--text-primary)' }}>Interested in sharing your knowledge?</p>
+                    <Link to="/teach" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem' }}>
+                      Start Teaching
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </main>
+      )
+    }
+
     return (
       <main className="profile-page">
         <div className="container" style={{ textAlign: 'center', paddingTop: 80 }}>
