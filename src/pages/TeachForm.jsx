@@ -137,6 +137,7 @@ function TeachForm() {
         contactMethod: formData.contactMethod,
         rating: 5.0,
         studentsCount: 1,
+        studentsHelped: 1,
         avatar: isTeacher
           ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
           : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
@@ -145,6 +146,7 @@ function TeachForm() {
         institution: userProfile?.institution || null,
         createdAt: new Date().toISOString()
       }
+
 
       // 1. Persist to Firestore if configured
       if (isFirebaseConfigured && db) {

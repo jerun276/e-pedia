@@ -13,42 +13,14 @@ const AuthContext = createContext(null)
 const LOCAL_STORAGE_USER_KEY = 'epedia_auth_user'
 const LOCAL_STORAGE_USERS_REGISTRY = 'epedia_registered_users'
 
-export const DEMO_USERS = {
-  learner: {
-    uid: 'demo-learner-101',
-    email: 'kasun.learner@epedia.lk',
-    name: 'Kasun Bandara',
-    role: 'learner',
-    studentId: 'STU/2026/0492',
-    institution: 'University of Colombo',
-    isVerified: true,
-    savedMentors: [1, 4],
-    createdAt: new Date().toISOString()
-  },
-  teacher: {
-    uid: 'demo-teacher-202',
-    email: 'priyantha.silva@epedia.lk',
-    name: 'Dr. Priyantha Silva',
-    role: 'teacher',
-    lecturerId: 'LEC/SL/8821',
-    institution: 'Faculty of Computing, SLIIT',
-    teachingLevel: 'Expert',
-    isVerified: true,
-    skillCategory: 'Technology',
-    skills: 'Cloud Architecture & Web Platforms',
-    district: 'Colombo',
-    createdAt: new Date().toISOString()
-  }
-}
-
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Initialize session from localStorage or Firebase
+  // Initialize session from Firebase Auth and localStorage
   useEffect(() => {
-    // 1. Check local session storage first
+    // 1. Check local session storage first for immediate render
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY)
       if (stored) {
@@ -60,7 +32,7 @@ export function AuthProvider({ children }) {
       console.error('Failed to parse cached session:', err)
     }
 
-    // 2. If Firebase is configured with active credentials, listen to auth changes
+    // 2. Listen to real Firebase Auth state changes if Firebase is configured
     let unsubscribe = () => {}
     if (isFirebaseConfigured && auth) {
       unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
@@ -73,10 +45,27 @@ export function AuthProvider({ children }) {
                 const data = userDoc.data()
                 setUserProfile(data)
                 localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(data))
+              } else {
+                // If user authenticated but doc doesn't exist yet
+                const fallbackData = {
+                  uid: fbUser.uid,
+                  email: fbUser.email,
+                  name: fbUser.displayName || fbUser.email.split('@')[0],
+                  role: 'learner',
+                  createdAt: new Date().toISOString()
+                }
+                setUserProfile(fallbackData)
               }
             }
           } catch (e) {
             console.warn('Could not fetch Firestore user doc:', e)
+          }
+        } else {
+          // Firebase auth explicitly logged out
+          if (isFirebaseConfigured) {
+            setCurrentUser(null)
+            setUserProfile(null)
+            localStorage.removeItem(LOCAL_STORAGE_USER_KEY)
           }
         }
         setLoading(false)
@@ -94,7 +83,6 @@ export function AuthProvider({ children }) {
     setCurrentUser({ uid: profile.uid, email: profile.email })
     localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(profile))
 
-    // Also update in registered users registry
     try {
       const registryRaw = localStorage.getItem(LOCAL_STORAGE_USERS_REGISTRY)
       const registry = registryRaw ? JSON.parse(registryRaw) : []
@@ -110,7 +98,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // Register a new user
+  // Real Register function using Firebase Auth & Firestore
   const register = async (userData) => {
     const {
       email,
@@ -128,13 +116,20 @@ export function AuthProvider({ children }) {
     const cleanEmail = email.trim().toLowerCase()
     let uid = 'user_' + Date.now()
 
-    // Try Firebase Auth if live credentials exist
     if (isFirebaseConfigured && auth) {
       try {
         const userCred = await createUserWithEmailAndPassword(auth, cleanEmail, password)
         uid = userCred.user.uid
       } catch (fbErr) {
-        console.warn('Firebase Auth failed, continuing with secure local session:', fbErr.message)
+        if (fbErr.code === 'auth/email-already-in-use') {
+          throw new Error('This email address is already registered. Please sign in instead.')
+        } else if (fbErr.code === 'auth/weak-password') {
+          throw new Error('Password should be at least 6 characters.')
+        } else if (fbErr.code === 'auth/invalid-email') {
+          throw new Error('Please enter a valid email address.')
+        } else {
+          throw new Error(fbErr.message || 'Firebase Registration Error')
+        }
       }
     }
 
@@ -154,7 +149,6 @@ export function AuthProvider({ children }) {
       createdAt: new Date().toISOString()
     }
 
-    // Attempt Firestore persistence if available
     if (isFirebaseConfigured && db) {
       try {
         await setDoc(doc(db, 'users', uid), newProfile)
@@ -167,11 +161,10 @@ export function AuthProvider({ children }) {
     return { success: true, profile: newProfile }
   }
 
-  // Login existing user
+  // Real Login function using Firebase Auth & Firestore
   const login = async (email, password) => {
     const cleanEmail = email.trim().toLowerCase()
 
-    // 1. Try Firebase Auth
     if (isFirebaseConfigured && auth) {
       try {
         const userCred = await signInWithEmailAndPassword(auth, cleanEmail, password)
@@ -184,12 +177,32 @@ export function AuthProvider({ children }) {
             return { success: true, profile: data }
           }
         }
+
+        const fallbackProfile = {
+          uid,
+          email: cleanEmail,
+          name: cleanEmail.split('@')[0],
+          role: 'learner',
+          createdAt: new Date().toISOString()
+        }
+        saveSession(fallbackProfile)
+        return { success: true, profile: fallbackProfile }
       } catch (fbErr) {
-        console.warn('Firebase login failed or unconfigured, checking local registry:', fbErr.message)
+        if (
+          fbErr.code === 'auth/user-not-found' ||
+          fbErr.code === 'auth/wrong-password' ||
+          fbErr.code === 'auth/invalid-credential'
+        ) {
+          throw new Error('Invalid email or password. Please check your credentials.')
+        } else if (fbErr.code === 'auth/invalid-email') {
+          throw new Error('Please enter a valid email address.')
+        } else {
+          throw new Error(fbErr.message || 'Authentication failed.')
+        }
       }
     }
 
-    // 2. Check local registry fallback
+    // Check local registry fallback if Firebase credentials are unconfigured
     try {
       const registryRaw = localStorage.getItem(LOCAL_STORAGE_USERS_REGISTRY)
       const registry = registryRaw ? JSON.parse(registryRaw) : []
@@ -202,37 +215,19 @@ export function AuthProvider({ children }) {
       console.warn('Registry check error:', e)
     }
 
-    // 3. Fallback demo matching
-    if (cleanEmail === DEMO_USERS.learner.email.toLowerCase()) {
-      saveSession(DEMO_USERS.learner)
-      return { success: true, profile: DEMO_USERS.learner }
-    }
-    if (cleanEmail === DEMO_USERS.teacher.email.toLowerCase()) {
-      saveSession(DEMO_USERS.teacher)
-      return { success: true, profile: DEMO_USERS.teacher }
-    }
-
-    // Auto-create local session if simple testing
     const fallbackProfile = {
       uid: 'user_' + Date.now(),
       email: cleanEmail,
       name: cleanEmail.split('@')[0],
       role: 'learner',
       studentId: 'STU-' + Math.floor(1000 + Math.random() * 9000),
-      institution: 'Sri Lanka Higher Education',
+      institution: 'Sri Lanka Education',
       isVerified: false,
       savedMentors: [],
       createdAt: new Date().toISOString()
     }
     saveSession(fallbackProfile)
     return { success: true, profile: fallbackProfile }
-  }
-
-  // Quick 1-click Demo Login for Presentation & Evaluation
-  const quickDemoLogin = (roleType) => {
-    const demoData = roleType === 'teacher' ? DEMO_USERS.teacher : DEMO_USERS.learner
-    saveSession(demoData)
-    return demoData
   }
 
   // Logout
@@ -254,6 +249,11 @@ export function AuthProvider({ children }) {
     if (!userProfile) return
     const updated = { ...userProfile, ...data }
     saveSession(updated)
+    if (isFirebaseConfigured && db && userProfile.uid) {
+      setDoc(doc(db, 'users', userProfile.uid), updated, { merge: true }).catch(err =>
+        console.warn('Firestore profile update error:', err)
+      )
+    }
   }
 
   const value = {
@@ -268,7 +268,6 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    quickDemoLogin,
     updateProfile
   }
 

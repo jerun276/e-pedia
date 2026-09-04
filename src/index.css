@@ -38,8 +38,9 @@
   --transition-slow: 0.5s ease;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --container-max: 1200px;
-  --nav-height: 72px;
+  --nav-height: 104px;
 }
+
 
 /* --- Reset & Base --- */
 *,
@@ -145,6 +146,21 @@ input, select, textarea {
   font-size: 0.95rem;
   transition: all var(--transition-base);
   letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(8px);
+}
+
+.btn-outline:hover {
+  background: rgba(108, 99, 255, 0.2);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .btn-primary {
@@ -210,21 +226,29 @@ input, select, textarea {
   box-shadow: var(--shadow-lg);
 }
 
-/* --- Navbar --- */
-.navbar {
+/* --- Sticky/Fixed Top Header Wrapper --- */
+.app-header-fixed {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: var(--nav-height);
-  background: rgba(10, 10, 26, 0.85);
+  z-index: 1000;
+  background: var(--bg-dark);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Navbar --- */
+.navbar {
+  position: relative;
+  height: 64px;
+  background: rgba(10, 10, 26, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-glass);
-  z-index: 1000;
   display: flex;
   align-items: center;
 }
+
 
 .navbar .container {
   display: flex;
@@ -838,6 +862,11 @@ input, select, textarea {
   color: var(--text-primary);
   font-size: 0.95rem;
   transition: all var(--transition-fast);
+}
+
+select option {
+  background-color: #12122b;
+  color: var(--text-primary);
 }
 
 .form-input:focus,

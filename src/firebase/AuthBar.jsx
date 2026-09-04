@@ -138,61 +138,20 @@ export function AuthBar() {
               </button>
             </>
           ) : (
-            <>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Quick Test:</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    quickDemoLogin('learner')
-                    navigate('/explore')
-                  }}
-                  style={{
-                    background: 'rgba(108, 99, 255, 0.15)',
-                    border: '1px solid rgba(108, 99, 255, 0.3)',
-                    color: 'var(--primary-light)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '2px 8px',
-                    fontSize: '0.72rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Demo Learner
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    quickDemoLogin('teacher')
-                    navigate('/teach')
-                  }}
-                  style={{
-                    background: 'rgba(0, 212, 170, 0.12)',
-                    border: '1px solid rgba(0, 212, 170, 0.3)',
-                    color: 'var(--secondary)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '2px 8px',
-                    fontSize: '0.72rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Demo Teacher
-                </button>
-              </div>
-
-              <Link
-                to="/auth"
-                style={{
-                  color: 'var(--primary-light)',
-                  fontWeight: 600,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <LogIn size={13} /> Sign In / Register
-              </Link>
-            </>
+            <Link
+              to="/auth"
+              style={{
+                color: 'var(--primary-light)',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <LogIn size={13} /> Sign In / Register
+            </Link>
           )}
+
         </div>
       </div>
     </div>

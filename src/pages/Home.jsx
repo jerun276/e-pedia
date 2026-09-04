@@ -141,7 +141,7 @@ function Home() {
       {/* ===== Features Section ===== */}
       <section className="section" id="features-section">
         <div className="container">
-          <h2 className="section-title" ref={addRef} className="section-title animate-on-scroll">
+          <h2 className="section-title animate-on-scroll" ref={addRef} className="section-title ">
             How <span className="gradient-text">E-Pedia</span> Works
           </h2>
           <p className="section-subtitle">

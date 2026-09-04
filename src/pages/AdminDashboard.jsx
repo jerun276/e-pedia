@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import VerificationQueue from '../components/admin/VerificationQueue';
 import UserManagement from '../components/admin/UserManagement';
 import AdminModal from '../components/admin/AdminModal';
-import { Users, FileCheck, Shield } from 'lucide-react';
+import { Users, FileCheck, Shield, Database } from 'lucide-react';
+import { seedInitialMentors } from '../firebase/seedDb';
+import { isFirebaseConfigured } from '../firebase/config';
+
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('verification');
@@ -95,7 +98,26 @@ const AdminDashboard = () => {
             <p>Banned Accounts</p>
           </div>
         </div>
+        <div className="stat-card glass-card" style={{ cursor: 'pointer' }} onClick={async () => {
+          if (!isFirebaseConfigured) {
+            alert('Please configure your Firebase credentials in .env first!')
+            return
+          }
+          const res = await seedInitialMentors()
+          if (res.success) {
+            alert(res.seeded ? `Success! Seeded ${res.count} mentors to Firestore!` : `Firestore already contains ${res.count} mentors.`)
+          } else {
+            alert('Error seeding database: ' + res.error)
+          }
+        }}>
+          <Database size={28} className="stat-icon primary-text" />
+          <div className="stat-info">
+            <h3 style={{ fontSize: '1rem', color: 'var(--primary-light)' }}>Sync Database</h3>
+            <p>Seed Firestore DB</p>
+          </div>
+        </div>
       </div>
+
 
       <div className="admin-content">
         <div className="admin-tabs">

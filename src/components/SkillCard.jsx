@@ -7,8 +7,19 @@ function SkillCard({ mentor }) {
   return (
     <div className="mentor-card glass-card" id={`mentor-card-${mentor.id}`}>
       <div className="mentor-card-header">
-        <div className="mentor-avatar">{mentor.avatar}</div>
+        <div className="mentor-avatar">
+          {typeof mentor.avatar === 'string' && mentor.avatar.startsWith('http') ? (
+            <img
+              src={mentor.avatar}
+              alt={mentor.name}
+              style={{ width: '100%', height: '100%', borderRadius: 'inherit', objectFit: 'cover' }}
+            />
+          ) : (
+            mentor.avatar || (mentor.name ? mentor.name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'EP')
+          )}
+        </div>
         <div className="mentor-info">
+
           <h3>{mentor.name}</h3>
           <p className="mentor-skill">{mentor.skill}</p>
         </div>

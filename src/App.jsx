@@ -25,9 +25,12 @@ function App() {
   return (
     <AuthProvider>
       <ScrollToTop />
-      <AuthBar />
-      <Navbar />
+      <header className="app-header-fixed">
+        <AuthBar />
+        <Navbar />
+      </header>
       <Routes>
+
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/quiz" element={<AiQuiz />} />

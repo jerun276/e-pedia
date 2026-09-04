@@ -52,18 +52,6 @@ function Auth() {
     if (mode === 'register') {
       if (!formData.name.trim()) errs.name = 'Full name is required'
       if (formData.name.trim().length < 3) errs.name = 'Name must be at least 3 characters'
-
-      if (role === 'learner') {
-        if (!formData.studentId.trim()) errs.studentId = 'Student ID / Reg No is required for verification'
-      } else {
-        if (!formData.lecturerId.trim()) errs.lecturerId = 'Lecturer / Teacher ID is required for verification'
-      }
-
-      if (!formData.institution.trim()) {
-        errs.institution = role === 'learner'
-          ? 'School or University name is required'
-          : 'University, Institute, or Organization is required'
-      }
     }
 
     if (!formData.email.trim()) {
@@ -71,6 +59,7 @@ function Auth() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errs.email = 'Please enter a valid email address'
     }
+
 
     if (!formData.password) {
       errs.password = 'Password is required'
@@ -347,62 +336,6 @@ function Auth() {
         {/* Form Container */}
         <div className="glass-card" style={{ padding: '32px' }}>
 
-          {/* Quick Demo Login Pill for Hackathon Evaluators */}
-          <div style={{
-            background: 'rgba(108, 99, 255, 0.08)',
-            border: '1px dashed rgba(108, 99, 255, 0.3)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 16px',
-            marginBottom: '24px'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              color: 'var(--primary-light)',
-              marginBottom: '8px'
-            }}>
-              <Sparkles size={14} /> Quick Demo Access (1-Click Evaluation):
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('learner')}
-                className="btn btn-sm"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid var(--border-glass)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <BookOpen size={14} color="var(--primary-light)" /> Demo Learner
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoLogin('teacher')}
-                className="btn btn-sm"
-                style={{
-                  background: 'rgba(0, 212, 170, 0.1)',
-                  border: '1px solid rgba(0, 212, 170, 0.3)',
-                  color: 'var(--secondary)',
-                  fontSize: '0.8rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <GraduationCap size={14} color="var(--secondary)" /> Verified Teacher
-              </button>
-            </div>
-          </div>
 
           {authError && (
             <div style={{
@@ -614,70 +547,66 @@ function Auth() {
                   <>
                     <div className="form-group" style={{ marginBottom: '12px' }}>
                       <label className="form-label" htmlFor="auth-student-id">
-                        Student ID / Index Number <span className="required">*</span>
+                        Student ID / Index Number <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 400 }}>(Optional - for Verified Badge)</span>
                       </label>
                       <input
                         type="text"
                         id="auth-student-id"
-                        className={`form-input ${errors.studentId ? 'error' : ''}`}
+                        className="form-input"
                         placeholder="e.g., IT24102883 or STU/2026/102"
                         value={formData.studentId}
                         onChange={(e) => handleInputChange('studentId', e.target.value)}
                       />
-                      {errors.studentId && <div className="form-error"><AlertCircle size={14} /> {errors.studentId}</div>}
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label className="form-label" htmlFor="auth-learner-institution">
-                        School / University / Institute <span className="required">*</span>
+                        School / University / Institute <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 400 }}>(Optional)</span>
                       </label>
                       <input
                         type="text"
                         id="auth-learner-institution"
-                        className={`form-input ${errors.institution ? 'error' : ''}`}
+                        className="form-input"
                         placeholder="e.g., University of Moratuwa / SLIIT"
                         value={formData.institution}
                         onChange={(e) => handleInputChange('institution', e.target.value)}
                       />
-                      {errors.institution && <div className="form-error"><AlertCircle size={14} /> {errors.institution}</div>}
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="form-group" style={{ marginBottom: '12px' }}>
                       <label className="form-label" htmlFor="auth-lecturer-id">
-                        Lecturer ID / Teacher Registration No <span className="required">*</span>
+                        Lecturer ID / Teacher Registration No <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 400 }}>(Optional - for Verified Badge)</span>
                       </label>
                       <input
                         type="text"
                         id="auth-lecturer-id"
-                        className={`form-input ${errors.lecturerId ? 'error' : ''}`}
+                        className="form-input"
                         placeholder="e.g., LEC/2026/SL89 or VTA-889"
                         value={formData.lecturerId}
                         onChange={(e) => handleInputChange('lecturerId', e.target.value)}
                       />
-                      {errors.lecturerId && <div className="form-error"><AlertCircle size={14} /> {errors.lecturerId}</div>}
                     </div>
 
                     <div className="form-group" style={{ marginBottom: '12px' }}>
                       <label className="form-label" htmlFor="auth-teacher-institution">
-                        Institution / University / Academy <span className="required">*</span>
+                        Institution / University / Academy <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 400 }}>(Optional)</span>
                       </label>
                       <input
                         type="text"
                         id="auth-teacher-institution"
-                        className={`form-input ${errors.institution ? 'error' : ''}`}
+                        className="form-input"
                         placeholder="e.g., Faculty of Computing / Craft Guild Sri Lanka"
                         value={formData.institution}
                         onChange={(e) => handleInputChange('institution', e.target.value)}
                       />
-                      {errors.institution && <div className="form-error"><AlertCircle size={14} /> {errors.institution}</div>}
                     </div>
 
                     {/* Teaching Level Specification */}
                     <div className="form-group" style={{ marginBottom: '12px' }}>
                       <label className="form-label" htmlFor="auth-teaching-level">
-                        Teaching Level Specification <span className="required">*</span>
+                        Teaching Level Preference <span className="required">*</span>
                       </label>
                       <select
                         id="auth-teaching-level"
@@ -691,9 +620,10 @@ function Auth() {
                         <option value="Expert">Expert (University, professional & advanced industry)</option>
                       </select>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>
-                        Specifies the audience difficulty level for your upcoming sessions.
+                        Specifies your target audience level when sharing knowledge.
                       </span>
                     </div>
+
 
                     {/* Skill Category */}
                     <div className="form-group" style={{ marginBottom: 0 }}>

@@ -193,8 +193,12 @@ function AiQuiz() {
                         borderRadius: '20px',
                         fontSize: '0.85rem',
                         padding: '6px 14px',
-                        borderColor: topic === item ? 'var(--accent-primary)' : 'var(--border-color)',
-                        background: topic === item ? 'rgba(99, 102, 241, 0.15)' : 'transparent'
+                        borderColor: topic === item ? 'var(--primary)' : 'var(--border-glass)',
+                        background: topic === item ? 'rgba(108, 99, 255, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                        color: topic === item ? '#ffffff' : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontWeight: topic === item ? '600' : '500',
+                        transition: 'all 0.2s ease'
                       }}
                       onClick={() => {
                         setTopic(item)
