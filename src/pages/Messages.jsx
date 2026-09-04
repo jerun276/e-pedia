@@ -30,7 +30,7 @@ function Messages() {
 
     const q = query(
       collection(db, 'chats'),
-      where('participants', 'array-contains', userProfile.uid),
+      where('participantEmails', 'array-contains', userProfile.email),
     )
 
     const unsubscribe = onSnapshot(q, (snapshot) => {

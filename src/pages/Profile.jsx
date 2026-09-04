@@ -262,19 +262,22 @@ function Profile() {
     setIsMessaging(true)
     try {
       if (isFirebaseConfigured && db) {
-        // Check if chat already exists
+        // Check if chat already exists by emails (most robust)
         const q = query(
           collection(db, 'chats'),
-          where('participants', 'array-contains', userProfile.uid)
+          where('participantEmails', 'array-contains', userProfile.email)
         )
         const snap = await getDocs(q)
         
-        // Firestore doesn't support 'array-contains-all', so filter manually
+        // Filter manually for the mentor's email
         let existingChatId = null
         snap.forEach(doc => {
           const data = doc.data()
-          if (data.participants && data.participants.includes(mentor.uid || mentor.id)) {
+          if (data.participantEmails && data.participantEmails.includes(mentor.email)) {
             existingChatId = doc.id
+          } else if (data.participants && data.participants.includes(mentor.uid || mentor.id) && data.participants.includes(userProfile.uid)) {
+             // Fallback for older chats without emails
+             existingChatId = doc.id
           }
         })
 
@@ -285,6 +288,7 @@ function Profile() {
           const mentorId = mentor.uid || mentor.id
           const newChatData = {
             participants: [userProfile.uid, mentorId],
+            participantEmails: [userProfile.email, mentor.email],
             participantDetails: {
               [userProfile.uid]: {
                 name: userProfile.name,
