@@ -7,7 +7,10 @@
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite)
 ![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase)
 
+📖 **Full Feature Specification:** See [`FEATURES.md`](file:///c:/Users/jerun/OneDrive/Desktop/SEF/SEF_Hackathon/e-pedia/FEATURES.md) for detailed documentation of all user roles, AI tools, messaging, feedback, and admin moderation features.
+
 ---
+
 
 ## 📌 The Problem
 
@@ -32,11 +35,12 @@ The **education access gap** disproportionately affects rural communities, where
 
 1. **🏠 Landing Page** — Hero section with animated stats, problem statement, and clear CTAs
 2. **🔍 Explore Mentors** — Search and filter 18+ mentors by category, district, and experience level
-3. **📝 Mentor Registration** — Complete form with real-time validation and 9 input fields
-4. **👤 Mentor Profiles** — Detailed view with ratings, student count, and contact info
-5. **ℹ️ About Page** — Detailed problem explanation and impact demonstration
-6. **📱 Responsive Design** — Works seamlessly on desktop, tablet, and mobile
-7. **🎨 Premium Dark UI** — Glassmorphism design with smooth animations
+3. **🤖 AI Quiz & Study Assistant** — Enter any topic to get AI-generated quizzes, score breakdown, and "Areas to Master" gap analysis
+4. **📝 Mentor Registration** — Complete form with real-time validation and 9 input fields
+5. **👤 Mentor Profiles** — Detailed view with ratings, student count, and contact info
+6. **ℹ️ About Page** — Detailed problem explanation and impact demonstration
+7. **📱 Responsive Design** — Works seamlessly on desktop, tablet, and mobile
+8. **🎨 Premium Dark UI** — Glassmorphism design with smooth animations
 
 ## 🛠️ Technologies Used
 
@@ -45,6 +49,7 @@ The **education access gap** disproportionately affects rural communities, where
 | **React 18**           | Frontend UI framework              |
 | **Vite 5**             | Build tool & dev server            |
 | **React Router v6**    | Client-side routing (SPA)          |
+| **Google Gemini API**  | AI Quiz generation & gap analysis  |
 | **Firebase Firestore** | Cloud database for mentor data     |
 | **Lucide React**       | Modern icon library                |
 | **Vanilla CSS**        | Custom glassmorphism design system |
@@ -52,12 +57,11 @@ The **education access gap** disproportionately affects rural communities, where
 
 ## 🤖 AI Tools Used
 
-<!-- UPDATE THIS SECTION with your actual AI usage -->
-
 | Tool                            | Usage                                                                                                                                                   |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Google Antigravity (Gemini)** | Generated initial project scaffold, component structure, CSS design system, and sample data. All code reviewed, tested, and understood by team members. |
-| _Add more tools here_           | _Description of usage_                                                                                                                                  |
+| **Google Gemini API / Antigravity** | Drives the interactive AI Quiz & Study Assistant, generating dynamic questions, score breakdown, and personalized skill gap analysis ("Areas to Master"). |
+| **Google Antigravity Agent**    | Generated project scaffold, glassmorphism design system, component architecture, and automated test validation. |
+
 
 ## 👥 Team Members & Contributions
 

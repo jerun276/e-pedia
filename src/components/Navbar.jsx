@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Sparkles } from 'lucide-react'
 
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -9,6 +9,7 @@ function Navbar() {
   const navItems = [
     { path: '/', label: 'Home' },
     { path: '/explore', label: 'Explore' },
+    { path: '/quiz', label: 'AI Quiz', isAi: true },
     { path: '/about', label: 'About' },
   ]
 
@@ -34,11 +35,19 @@ function Navbar() {
                   className={({ isActive }) => isActive ? 'active' : ''}
                   end={item.path === '/'}
                 >
-                  {item.label}
+                  {item.isAi ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <Sparkles size={14} style={{ color: 'var(--accent-amber)' }} />
+                      {item.label}
+                    </span>
+                  ) : (
+                    item.label
+                  )}
                 </NavLink>
               </li>
             ))}
           </ul>
+
 
           <button
             className="btn btn-primary btn-sm nav-cta desktop-only"

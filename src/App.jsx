@@ -7,6 +7,7 @@ import Explore from './pages/Explore'
 import TeachForm from './pages/TeachForm'
 import About from './pages/About'
 import Profile from './pages/Profile'
+import AiQuiz from './pages/AiQuiz'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/quiz" element={<AiQuiz />} />
         <Route path="/teach" element={<TeachForm />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile/:id" element={<Profile />} />
@@ -34,3 +36,4 @@ function App() {
 }
 
 export default App
+

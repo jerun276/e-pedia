@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { ArrowRight, Search, Users, BookOpen, Globe, TrendingUp, Shield, Lightbulb } from 'lucide-react'
+import { ArrowRight, Search, Users, BookOpen, Globe, TrendingUp, Shield, Lightbulb, Sparkles } from 'lucide-react'
 import SkillCard from '../components/SkillCard'
 import { sampleMentors } from '../data/sampleData'
 
@@ -61,11 +61,16 @@ function Home() {
                 <Search size={20} />
                 Find a Mentor
               </Link>
-              <Link to="/teach" className="btn btn-accent btn-lg" id="hero-teach-btn">
+              <Link to="/quiz" className="btn btn-accent btn-lg" id="hero-quiz-btn" style={{ gap: '8px' }}>
+                <Sparkles size={20} />
+                AI Quiz Assistant
+              </Link>
+              <Link to="/teach" className="btn btn-outline btn-lg" id="hero-teach-btn">
                 Start Teaching
                 <ArrowRight size={20} />
               </Link>
             </div>
+
 
             <div className="hero-stats">
               <div className="hero-stat">
