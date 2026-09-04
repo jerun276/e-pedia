@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Star, Users } from 'lucide-react'
+import { Award, BadgeCheck, MapPin, Star, Users } from 'lucide-react'
 
 function SkillCard({ mentor }) {
+  const isTopMentor = mentor.rating >= 4.8 && mentor.studentsHelped >= 20
+
   return (
     <div className="mentor-card glass-card" id={`mentor-card-${mentor.id}`}>
       <div className="mentor-card-header">
@@ -19,6 +21,8 @@ function SkillCard({ mentor }) {
           {mentor.district}
         </span>
         <span className="mentor-badge">{mentor.experienceLevel}</span>
+        {mentor.verified && <span className="mentor-badge verified-badge"><BadgeCheck size={12} /> Verified</span>}
+        {isTopMentor && <span className="mentor-badge top-mentor-badge"><Award size={12} /> Top Mentor</span>}
       </div>
 
       <p className="mentor-description">{mentor.description}</p>

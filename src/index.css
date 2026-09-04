@@ -614,6 +614,35 @@ input, select, textarea {
   border-color: rgba(0, 212, 170, 0.2);
 }
 
+.mentor-badge.verified-badge,
+.recognition-badge.learner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(46, 213, 115, 0.12);
+  color: var(--success);
+  border-color: rgba(46, 213, 115, 0.3);
+}
+
+.mentor-badge.top-mentor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--warning);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.recognition-badge.learner-badge {
+  width: fit-content;
+  margin: 0 auto 18px;
+  padding: 8px 14px;
+  border: 1px solid rgba(46, 213, 115, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 .mentor-description {
   font-size: 0.88rem;
   color: var(--text-secondary);

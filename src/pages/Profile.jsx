@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, CheckCircle, MapPin, Send, Star, Users, Clock, Mail, Phone, MessageCircle, X } from 'lucide-react'
+import { AlertCircle, Award, ArrowLeft, BadgeCheck, CheckCircle, MapPin, Send, Star, Users, Clock, Mail, Phone, MessageCircle, X } from 'lucide-react'
 import { sampleMentors } from '../data/sampleData'
 
 function Profile() {
@@ -46,6 +46,7 @@ function Profile() {
     ? ((mentor.rating * mentor.studentsHelped + reviews.reduce((total, review) => total + review.rating, 0)) /
       (mentor.studentsHelped + reviewCount)).toFixed(1)
     : mentor.rating
+  const isTopMentor = Number(averageRating) >= 4.8 && mentor.studentsHelped >= 20
 
   const openContact = () => {
     setContactSent(false)
@@ -110,6 +111,8 @@ function Profile() {
                   {mentor.district}
                 </span>
                 <span className="mentor-badge">{mentor.experienceLevel}</span>
+                {mentor.verified && <span className="mentor-badge verified-badge"><BadgeCheck size={12} /> Verified</span>}
+                {isTopMentor && <span className="mentor-badge top-mentor-badge"><Award size={12} /> Top Mentor</span>}
               </div>
             </div>
           </div>

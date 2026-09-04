@@ -49,6 +49,10 @@ function AiQuiz() {
 
   // Results State
   const [results, setResults] = useState(null)
+  const [quizProgress, setQuizProgress] = useState(() => {
+    const savedProgress = localStorage.getItem('e-pedia-quiz-progress')
+    return savedProgress ? JSON.parse(savedProgress) : { qualifiedQuizzes: 0 }
+  })
 
   // Timer effect
   useEffect(() => {
@@ -111,6 +115,11 @@ function AiQuiz() {
     setTimerActive(false)
     const analysis = analyzeQuizResults(quiz, userAnswers, timeSpent)
     setResults(analysis)
+    if (analysis.percentage >= 80) {
+      const updatedProgress = { qualifiedQuizzes: quizProgress.qualifiedQuizzes + 1 }
+      setQuizProgress(updatedProgress)
+      localStorage.setItem('e-pedia-quiz-progress', JSON.stringify(updatedProgress))
+    }
   }
 
   // Reset Quiz
@@ -379,6 +388,11 @@ function AiQuiz() {
               <div style={{ fontSize: '1.1rem', fontWeight: '700', color: results.gradeColor, marginBottom: '12px' }}>
                 Status: {results.grade}
               </div>
+              {quizProgress.qualifiedQuizzes >= 5 && (
+                <div className="recognition-badge learner-badge">
+                  <Award size={17} /> Master Learner
+                </div>
+              )}
               <p className="text-secondary" style={{ maxWidth: '550px', margin: '0 auto 20px' }}>
                 {results.summaryText} Time spent: {formatTime(results.timeSpentSeconds)}.
               </p>
