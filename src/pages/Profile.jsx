@@ -14,6 +14,7 @@ function Profile() {
   const [mentor, setMentor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [targetUser, setTargetUser] = useState(null)
+  const [isMessaging, setIsMessaging] = useState(false)
 
   useEffect(() => {
     const findMentor = async () => {
@@ -245,7 +246,6 @@ function Profile() {
     : mentor.rating
   const isTopMentor = Number(averageRating) >= 4.8 && mentor.studentsHelped >= 20
 
-  const [isMessaging, setIsMessaging] = useState(false)
 
   const handleMessageMentor = async () => {
     if (!userProfile) {
