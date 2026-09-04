@@ -13,6 +13,7 @@ function Profile() {
   
   const [mentor, setMentor] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [targetUser, setTargetUser] = useState(null)
 
   useEffect(() => {
     const findMentor = async () => {
@@ -42,7 +43,7 @@ function Profile() {
         }
       }
       
-      // 3. Check Firestore
+      // 3. Check Firestore Mentors
       if (!found && isFirebaseConfigured && db) {
         try {
           if (isMe && searchEmail) {
@@ -66,8 +67,27 @@ function Profile() {
           console.warn('Firestore fetch mentor warning:', e.message)
         }
       }
+
+      // 4. Check Firestore Users (if not a mentor)
+      let foundUser = null;
+      if (!found) {
+        if (isMe) {
+          foundUser = userProfile;
+        } else if (isFirebaseConfigured && db) {
+          try {
+            const userDocRef = doc(db, 'users', id);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              foundUser = { uid: userDocSnap.id, ...userDocSnap.data() };
+            }
+          } catch (e) {
+            console.warn('Firestore fetch user warning:', e.message);
+          }
+        }
+      }
       
       setMentor(found || null)
+      setTargetUser(foundUser || null)
       setLoading(false)
     }
     
@@ -105,9 +125,9 @@ function Profile() {
   }
 
   if (!mentor) {
-    if ((id === 'me' || id === userProfile?.uid) && userProfile) {
-      const isTeacher = userProfile.role === 'teacher' || userProfile.email?.includes('teacher')
-      const isAdmin = userProfile.role === 'admin' || userProfile.email?.includes('admin')
+    if (targetUser) {
+      const isTeacher = targetUser.role === 'teacher' || targetUser.email?.includes('teacher')
+      const isAdmin = targetUser.role === 'admin' || targetUser.email?.includes('admin')
       
       const getInitials = (name) => {
         if (!name) return 'U'
@@ -152,17 +172,17 @@ function Profile() {
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)'
                   }}
                 >
-                  {getInitials(userProfile.name)}
+                  {getInitials(targetUser.name)}
                 </div>
-                <h2 style={{ fontSize: '2rem', marginBottom: 8 }}>{userProfile.name}</h2>
+                <h2 style={{ fontSize: '2rem', marginBottom: 8 }}>{targetUser.name}</h2>
                 <p className="profile-skill" style={{ marginBottom: 24, fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                  {userProfile.email}
+                  {targetUser.email}
                 </p>
                 <div className="profile-badges" style={{ justifyContent: 'center' }}>
                   <span className="mentor-badge category" style={{ fontSize: '0.9rem', padding: '6px 16px' }}>
                     {isAdmin ? 'ADMINISTRATOR' : isTeacher ? 'TEACHER' : 'LEARNER'}
                   </span>
-                  {userProfile.verified && (
+                  {targetUser.verified && (
                     <span className="mentor-badge verified-badge" style={{ fontSize: '0.9rem', padding: '6px 16px' }}>
                       <BadgeCheck size={16} style={{ marginRight: 6 }} /> Verified
                     </span>
@@ -171,16 +191,24 @@ function Profile() {
               </div>
               
               <div className="profile-details glass-card" style={{ marginTop: 24, textAlign: 'center', padding: '32px' }}>
-                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                  You are currently signed in as a <strong style={{ color: 'var(--text-primary)' }}>{isAdmin ? 'System Administrator' : isTeacher ? 'Teacher' : 'Student'}</strong>.
-                </p>
-                {!isTeacher && !isAdmin && (
-                  <div style={{ marginTop: 32 }}>
-                    <p style={{ marginBottom: 16, color: 'var(--text-primary)' }}>Interested in sharing your knowledge?</p>
-                    <Link to="/teach" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem' }}>
-                      Start Teaching
-                    </Link>
-                  </div>
+                {id === 'me' || id === userProfile?.uid ? (
+                  <>
+                    <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                      You are currently signed in as a <strong style={{ color: 'var(--text-primary)' }}>{isAdmin ? 'System Administrator' : isTeacher ? 'Teacher' : 'Student'}</strong>.
+                    </p>
+                    {!isTeacher && !isAdmin && (
+                      <div style={{ marginTop: 32 }}>
+                        <p style={{ marginBottom: 16, color: 'var(--text-primary)' }}>Interested in sharing your knowledge?</p>
+                        <Link to="/teach" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: '1rem' }}>
+                          Start Teaching
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                    This user is registered as a <strong style={{ color: 'var(--text-primary)' }}>{isAdmin ? 'System Administrator' : isTeacher ? 'Teacher' : 'Student'}</strong>.
+                  </p>
                 )}
               </div>
             </div>
