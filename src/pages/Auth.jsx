@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuth } from '../firebase/AuthContext'
 import {
   GraduationCap,
@@ -14,9 +14,12 @@ import { categories } from '../data/sampleData'
 
 function Auth() {
   const [searchParams] = useSearchParams()
+  const location = useLocation()
   const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login'
   const [mode, setMode] = useState(initialMode) // 'login' | 'register'
   const [role, setRole] = useState('learner') // 'learner' | 'teacher'
+
+  const redirectPath = location.state?.from || null
 
   const { login, register, quickDemoLogin, currentUser, userProfile, logout } = useAuth()
   const navigate = useNavigate()
@@ -93,7 +96,7 @@ function Auth() {
         if (res.success) {
           setSuccessMessage('Successfully signed in! Redirecting...')
           setTimeout(() => {
-            navigate(res.profile.role === 'teacher' ? '/teach' : '/explore')
+            navigate(redirectPath || (res.profile.role === 'teacher' ? '/teach' : '/explore'))
           }, 800)
         }
       } else {
@@ -104,7 +107,7 @@ function Auth() {
         if (res.success) {
           setSuccessMessage('Account created successfully! Welcome to E-Pedia.')
           setTimeout(() => {
-            navigate(role === 'teacher' ? '/teach' : '/explore')
+            navigate(redirectPath || (role === 'teacher' ? '/teach' : '/explore'))
           }, 900)
         }
       }
@@ -119,7 +122,7 @@ function Auth() {
     quickDemoLogin(roleType)
     setSuccessMessage(`Signed in as Demo ${roleType === 'teacher' ? 'Teacher' : 'Learner'}! Redirecting...`)
     setTimeout(() => {
-      navigate(roleType === 'teacher' ? '/teach' : '/explore')
+      navigate(redirectPath || (roleType === 'teacher' ? '/teach' : '/explore'))
     }, 700)
   }
 
@@ -285,6 +288,24 @@ function Auth() {
               : 'Empowering knowledge exchange across Sri Lanka — Choose your role'}
           </p>
         </div>
+
+        {location.state?.message && (
+          <div style={{
+            padding: '12px 16px',
+            borderRadius: '12px',
+            background: 'rgba(108, 99, 255, 0.15)',
+            border: '1px solid rgba(108, 99, 255, 0.3)',
+            color: 'var(--primary-light)',
+            fontSize: '0.9rem',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <Sparkles size={18} style={{ flexShrink: 0, color: 'var(--accent-amber)' }} />
+            <span>{location.state.message}</span>
+          </div>
+        )}
 
         {/* Mode Switcher Tabs */}
         <div style={{

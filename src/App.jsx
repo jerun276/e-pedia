@@ -33,13 +33,20 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/quiz" element={<AiQuiz />} />
         <Route path="/about" element={<About />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
 
-        {/* Protected Routes */}
+        {/* Protected Routes (Registered Users Only) */}
+        <Route
+          path="/quiz"
+          element={
+            <ProtectedRoute>
+              <AiQuiz />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/teach"
           element={
