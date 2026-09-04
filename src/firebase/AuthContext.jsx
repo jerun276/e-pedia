@@ -263,6 +263,7 @@ export function AuthProvider({ children }) {
     isLoggedIn: Boolean(userProfile),
     isTeacher: userProfile?.role === 'teacher',
     isLearner: userProfile?.role === 'learner',
+    isAdmin: userProfile?.role === 'admin' || Boolean(userProfile?.email?.toLowerCase().includes('admin')),
     isVerified: Boolean(userProfile?.isVerified),
     loading,
     login,

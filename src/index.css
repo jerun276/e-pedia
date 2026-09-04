@@ -38,7 +38,7 @@
   --transition-slow: 0.5s ease;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --container-max: 1200px;
-  --nav-height: 104px;
+  --nav-height: 72px;
 }
 
 
@@ -240,7 +240,7 @@ input, select, textarea {
 /* --- Navbar --- */
 .navbar {
   position: relative;
-  height: 64px;
+  height: 72px;
   background: rgba(10, 10, 26, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -363,6 +363,21 @@ input, select, textarea {
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.dropdown-logout-btn:hover {
+  background: rgba(255, 107, 107, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.nav-profile-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* --- Hero Section --- */
