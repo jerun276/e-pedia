@@ -19,8 +19,8 @@
 > **Change this to YOUR assigned role before starting work.**
 
 ```
-ROLE = "YOUR_ROLE_HERE"
-MEMBER_NAME = "YOUR_NAME"
+ROLE = "ROLE_3"
+MEMBER_NAME = "Jegajeevan"
 ```
 
 ### Role Options:
@@ -37,7 +37,7 @@ MEMBER_NAME = "YOUR_NAME"
 |--------|-----------|------|------------------------|
 | Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md`, `FEATURES.md` |
 | Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*`, `src/components/admin/*` |
-| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/pages/AdminDashboard.jsx`, `src/pages/AiQuiz.jsx`, `src/services/aiService.js`, `src/firebase/*`, `src/App.jsx` |
+| Jegajeevan | IT24102883 | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Auth.jsx`, `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/pages/AdminDashboard.jsx`, `src/pages/AiQuiz.jsx`, `src/services/aiService.js`, `src/firebase/*`, `src/App.jsx` |
 | Member 4 | IT________ | `ROLE_4_TESTING_DEPLOYMENT` | `vite.config.js`, `package.json`, `vercel.json`, `.gitignore`, deployment configs |
 
 > **Update the table above** with actual names and student IDs after pulling.
@@ -49,7 +49,7 @@ MEMBER_NAME = "YOUR_NAME"
 | Problem, solution, user-facing copy, and feature specification | `ROLE_1_PROBLEM_SOLUTION` | `Home.jsx`, `About.jsx`, `sampleData.js`, `README.md`, `FEATURES.md` |
 | Mentor discovery and profiles | `ROLE_2_UI_DEVELOPMENT` + `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `Profile.jsx`, `SkillCard.jsx`, `Explore.jsx`, `index.css` |
 | Communication and feedback tools | `ROLE_2_UI_DEVELOPMENT` | `Profile.jsx`, reusable components, `index.css` |
-| Authentication, role selection, and learner/teacher access | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `App.jsx`, `src/firebase/*`, authentication pages/components |
+| Authentication, role selection, and learner/teacher access | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `App.jsx`, `src/pages/Auth.jsx`, `src/firebase/*`, authentication pages/components |
 | AI quizzes, result analysis, and learner progress | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/AiQuiz.jsx`, `src/services/aiService.js`, persistence layer |
 | PDF quiz generation and document upload | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | quiz services, Firebase Storage, teacher workflow |
 | Scheduling, session booking, and direct messaging behavior | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | routing, Firebase services, profile communication UI |
@@ -87,6 +87,7 @@ e-pedia/
 │   │   ├── TeachForm.jsx       # (ROLE_3)
 │   │   ├── About.jsx           # (ROLE_1)
 │   │   ├── Profile.jsx         # (ROLE_2)
+│   │   ├── Auth.jsx            # (ROLE_3)
 │   │   └── AdminDashboard.jsx  # (ROLE_3)
 │   ├── firebase/               # Firebase config (ROLE_3)
 │   │   └── config.js
@@ -149,12 +150,15 @@ e-pedia/
 - [ ] Ensure responsive design works on mobile & desktop
 
 ### ROLE_3: Functional Implementation
-- [ ] Set up Firebase in `config.js`
+- [ ] Implement Authentication & Registration (Email/Password with Firebase Auth & session persistence)
+- [ ] Implement Dual User Types (Learner & Teacher/Mentor) and Role Management
+- [ ] Implement User Profile & Verification Credentials (Student ID, Lecturer ID, Teaching Level: Beginner/Intermediate/Expert)
+- [ ] Set up Firebase in `config.js` (Auth & Firestore)
 - [ ] Build `Explore.jsx` (search, filter, display mentors)
-- [ ] Build `TeachForm.jsx` (registration form with full validation)
+- [ ] Build `TeachForm.jsx` (registration form with full validation & Firestore persistence)
 - [ ] Build `AdminDashboard.jsx` (User ID Verification Management, Security & Content Moderation)
 - [ ] Set up routing in `App.jsx`
-- [ ] Implement data persistence and Platform CRUD Operations (Firestore)
+- [ ] Implement data persistence and Platform CRUD Operations (Firestore & offline fallback)
 - [ ] Implement messaging, review persistence, and session booking behavior
 - [ ] Input validation with friendly error messages
 

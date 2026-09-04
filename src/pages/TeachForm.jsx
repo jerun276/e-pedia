@@ -1,10 +1,14 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AlertCircle, CheckCircle, Send } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { AlertCircle, CheckCircle, Send, GraduationCap, ShieldCheck, Sparkles } from 'lucide-react'
 import { categories, districts, experienceLevels } from '../data/sampleData'
+import { useAuth } from '../firebase/AuthContext'
+import { db, isFirebaseConfigured } from '../firebase/config'
+import { collection, addDoc } from 'firebase/firestore'
 
 function TeachForm() {
   const navigate = useNavigate()
+  const { userProfile, isTeacher, isVerified } = useAuth()
   const [showSuccess, setShowSuccess] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -19,6 +23,20 @@ function TeachForm() {
     availability: [],
     contactMethod: '',
   })
+
+  // Auto pre-fill if authenticated as a teacher or user
+  useEffect(() => {
+    if (userProfile) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || userProfile.name || '',
+        email: prev.email || userProfile.email || '',
+        experienceLevel: prev.experienceLevel || userProfile.teachingLevel || '',
+        category: prev.category || userProfile.skillCategory || '',
+        district: prev.district || userProfile.district || ''
+      }))
+    }
+  }, [userProfile])
 
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
@@ -107,8 +125,47 @@ function TeachForm() {
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true)
 
-      // Simulate submission (replace with Firebase Firestore later)
-      await new Promise(resolve => setTimeout(resolve, 1200))
+      const newMentor = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        skill: formData.skill.trim(),
+        category: formData.category,
+        experienceLevel: formData.experienceLevel,
+        district: formData.district,
+        description: formData.description.trim(),
+        availability: formData.availability,
+        contactMethod: formData.contactMethod,
+        rating: 5.0,
+        studentsCount: 1,
+        avatar: isTeacher
+          ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+          : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        isVerified: Boolean(isVerified),
+        lecturerId: userProfile?.lecturerId || null,
+        institution: userProfile?.institution || null,
+        createdAt: new Date().toISOString()
+      }
+
+      // 1. Persist to Firestore if configured
+      if (isFirebaseConfigured && db) {
+        try {
+          const docRef = await addDoc(collection(db, 'mentors'), newMentor)
+          newMentor.id = docRef.id
+        } catch (err) {
+          console.warn('Firestore mentor submission warning:', err.message)
+        }
+      }
+
+      // 2. Always persist to localStorage for immediate Explore integration
+      try {
+        const existingRaw = localStorage.getItem('epedia_custom_mentors')
+        const existing = existingRaw ? JSON.parse(existingRaw) : []
+        newMentor.id = newMentor.id || 'mentor_' + Date.now()
+        existing.unshift(newMentor)
+        localStorage.setItem('epedia_custom_mentors', JSON.stringify(existing))
+      } catch (e) {
+        console.warn('Local storage cache warning:', e)
+      }
 
       setIsSubmitting(false)
       setShowSuccess(true)
@@ -131,6 +188,82 @@ function TeachForm() {
               learn new skills. Fill in your details below.
             </p>
           </div>
+
+          {/* User Role & Credential Status Banner */}
+          {userProfile ? (
+            <div style={{
+              background: isTeacher ? 'rgba(0, 212, 170, 0.08)' : 'rgba(108, 99, 255, 0.08)',
+              border: `1px solid ${isTeacher ? 'rgba(0, 212, 170, 0.25)' : 'rgba(108, 99, 255, 0.25)'}`,
+              borderRadius: 'var(--radius-md)',
+              padding: '14px 18px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  background: isTeacher ? 'var(--secondary)' : 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: isTeacher ? '#060612' : '#ffffff'
+                }}>
+                  {isTeacher ? <GraduationCap size={20} /> : <Sparkles size={18} />}
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    Logged in as {userProfile.name} {isTeacher ? '(Teacher / Mentor)' : '(Learner)'}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                    {isTeacher
+                      ? `Credentials verified • ID: ${userProfile.lecturerId || 'LEC-OK'} • Level: ${userProfile.teachingLevel || 'Expert'}`
+                      : 'Creating this listing will publish your mentor profile on E-Pedia'}
+                  </div>
+                </div>
+              </div>
+
+              {isVerified && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: 'var(--success)',
+                  background: 'rgba(46, 213, 115, 0.12)',
+                  padding: '4px 10px',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid rgba(46, 213, 115, 0.3)'
+                }}>
+                  <ShieldCheck size={14} /> ID VERIFIED
+                </span>
+              )}
+            </div>
+          ) : (
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px dashed var(--border-glass)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 18px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px',
+              fontSize: '0.85rem'
+            }}>
+              <span style={{ color: 'var(--text-secondary)' }}>
+                💡 Tip: <Link to="/auth?mode=register" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>Create a Teacher Account</Link> to get a Verified Credential Badge on your mentor card.
+              </span>
+            </div>
+          )}
 
           {/* Requirement #4: Form that accepts user input */}
           <form className="form-card glass-card" onSubmit={handleSubmit} noValidate id="teach-form">
