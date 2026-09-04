@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { ShieldAlert, ShieldCheck, Search } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Search, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const UserManagement = ({ users = [], onBan, onUnban }) => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const navigate = useNavigate();
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name?.toLowerCase().includes(search.toLowerCase()) || user.email?.toLowerCase().includes(search.toLowerCase());
@@ -58,15 +60,20 @@ const UserManagement = ({ users = [], onBan, onUnban }) => {
                   </span>
                 </td>
                 <td>
-                  {(user.status || 'Active') !== 'Banned' ? (
-                    <button onClick={() => onBan(user)} className="btn-sm btn-danger-outline" title="Ban User">
-                      <ShieldAlert size={14} /> Ban
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => navigate(`/profile/${user.uid || user.id}`)} className="btn-sm btn-secondary" title="View Profile">
+                      <User size={14} /> Profile
                     </button>
-                  ) : (
-                    <button onClick={() => onUnban(user)} className="btn-sm btn-success-outline" title="Unban User">
-                      <ShieldCheck size={14} /> Unban
-                    </button>
-                  )}
+                    {(user.status || 'Active') !== 'Banned' ? (
+                      <button onClick={() => onBan(user)} className="btn-sm btn-danger-outline" title="Ban User">
+                        <ShieldAlert size={14} /> Ban
+                      </button>
+                    ) : (
+                      <button onClick={() => onUnban(user)} className="btn-sm btn-success-outline" title="Unban User">
+                        <ShieldCheck size={14} /> Unban
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
