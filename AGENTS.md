@@ -19,8 +19,8 @@
 > **Change this to YOUR assigned role before starting work.**
 
 ```
-ROLE = "ROLE_1_PROBLEM_SOLUTION"
-MEMBER_NAME = "Jathurshan"
+ROLE = "YOUR_ROLE_HERE"
+MEMBER_NAME = "YOUR_NAME"
 ```
 
 ### Role Options:
@@ -36,8 +36,8 @@ MEMBER_NAME = "Jathurshan"
 | Member | Student ID | Role | Owned Files/Directories |
 |--------|-----------|------|------------------------|
 | Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md`, `FEATURES.md` |
-| Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*` |
-| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/firebase/*`, `src/App.jsx` |
+| Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*`, `src/components/admin/*` |
+| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/pages/AdminDashboard.jsx`, `src/pages/AiQuiz.jsx`, `src/services/aiService.js`, `src/firebase/*`, `src/App.jsx` |
 | Member 4 | IT________ | `ROLE_4_TESTING_DEPLOYMENT` | `vite.config.js`, `package.json`, `vercel.json`, `.gitignore`, deployment configs |
 
 > **Update the table above** with actual names and student IDs after pulling.
@@ -79,13 +79,15 @@ e-pedia/
 │   │   ├── Navbar.jsx
 │   │   ├── Footer.jsx
 │   │   ├── SkillCard.jsx
-│   │   └── SearchBar.jsx
+│   │   ├── SearchBar.jsx
+│   │   └── admin/              # Admin UI components (ROLE_2)
 │   ├── pages/                  # Page components
 │   │   ├── Home.jsx            # (ROLE_1)
 │   │   ├── Explore.jsx         # (ROLE_3)
 │   │   ├── TeachForm.jsx       # (ROLE_3)
 │   │   ├── About.jsx           # (ROLE_1)
-│   │   └── Profile.jsx         # (ROLE_2)
+│   │   ├── Profile.jsx         # (ROLE_2)
+│   │   └── AdminDashboard.jsx  # (ROLE_3)
 │   ├── firebase/               # Firebase config (ROLE_3)
 │   │   └── config.js
 │   ├── data/                   # Sample data (ROLE_1)
@@ -142,6 +144,7 @@ e-pedia/
 - [ ] Build `Profile.jsx` page (mentor detail view)
 - [ ] Build communication tools (mentor contact and inquiry interface)
 - [ ] Build feedback tools (star rating and written review interface)
+- [ ] Build Admin Panel UI components (Verification Queue table, Modals in `src/components/admin/`)
 - [ ] Polish `index.css` (responsive design, animations, glassmorphism)
 - [ ] Ensure responsive design works on mobile & desktop
 
@@ -149,10 +152,12 @@ e-pedia/
 - [ ] Set up Firebase in `config.js`
 - [ ] Build `Explore.jsx` (search, filter, display mentors)
 - [ ] Build `TeachForm.jsx` (registration form with full validation)
+- [ ] Build `AdminDashboard.jsx` (User ID Verification Management, Security & Content Moderation)
 - [ ] Set up routing in `App.jsx`
-- [ ] Implement data persistence (Firestore CRUD)
+- [ ] Implement data persistence and Platform CRUD Operations (Firestore)
 - [ ] Implement messaging, review persistence, and session booking behavior
 - [ ] Input validation with friendly error messages
+
 
 ### ROLE_4: Testing, Git & Deployment
 - [ ] Initialize Git repo and push initial scaffold
