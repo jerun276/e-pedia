@@ -19,8 +19,8 @@
 > **Change this to YOUR assigned role before starting work.**
 
 ```
-ROLE = "UNASSIGNED"
-MEMBER_NAME = "Your Name Here"
+ROLE = "ROLE_1_PROBLEM_SOLUTION"
+MEMBER_NAME = "Jathurshan"
 ```
 
 ### Role Options:
@@ -35,12 +35,25 @@ MEMBER_NAME = "Your Name Here"
 
 | Member | Student ID | Role | Owned Files/Directories |
 |--------|-----------|------|------------------------|
-| Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md` |
+| Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md`, `FEATURES.md` |
 | Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*` |
 | Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/firebase/*`, `src/App.jsx` |
 | Member 4 | IT________ | `ROLE_4_TESTING_DEPLOYMENT` | `vite.config.js`, `package.json`, `vercel.json`, `.gitignore`, deployment configs |
 
 > **Update the table above** with actual names and student IDs after pulling.
+
+### Feature Ownership Alignment
+
+| Feature Area | Primary Owner | Implementation Surface |
+|--------------|---------------|-------------------------|
+| Problem, solution, user-facing copy, and feature specification | `ROLE_1_PROBLEM_SOLUTION` | `Home.jsx`, `About.jsx`, `sampleData.js`, `README.md`, `FEATURES.md` |
+| Mentor discovery and profiles | `ROLE_2_UI_DEVELOPMENT` + `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `Profile.jsx`, `SkillCard.jsx`, `Explore.jsx`, `index.css` |
+| Communication and feedback tools | `ROLE_2_UI_DEVELOPMENT` | `Profile.jsx`, reusable components, `index.css` |
+| Authentication, role selection, and learner/teacher access | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `App.jsx`, `src/firebase/*`, authentication pages/components |
+| AI quizzes, result analysis, and learner progress | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/AiQuiz.jsx`, `src/services/aiService.js`, persistence layer |
+| PDF quiz generation and document upload | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | quiz services, Firebase Storage, teacher workflow |
+| Scheduling, session booking, and direct messaging behavior | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | routing, Firebase services, profile communication UI |
+| ID verification, badges, moderation, and admin CRUD | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` + `ROLE_4_TESTING_DEPLOYMENT` | admin views, Firebase rules/services, testing and deployment configuration |
 
 ---
 
@@ -127,6 +140,8 @@ e-pedia/
 - [ ] Build `SkillCard.jsx` (mentor card with avatar, badges, description)
 - [ ] Build `SearchBar.jsx` component
 - [ ] Build `Profile.jsx` page (mentor detail view)
+- [ ] Build communication tools (mentor contact and inquiry interface)
+- [ ] Build feedback tools (star rating and written review interface)
 - [ ] Polish `index.css` (responsive design, animations, glassmorphism)
 - [ ] Ensure responsive design works on mobile & desktop
 
@@ -136,6 +151,7 @@ e-pedia/
 - [ ] Build `TeachForm.jsx` (registration form with full validation)
 - [ ] Set up routing in `App.jsx`
 - [ ] Implement data persistence (Firestore CRUD)
+- [ ] Implement messaging, review persistence, and session booking behavior
 - [ ] Input validation with friendly error messages
 
 ### ROLE_4: Testing, Git & Deployment
