@@ -1,24 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShieldAlert, ShieldCheck, Search } from 'lucide-react';
 
-const mockUsers = [
-  { id: 101, name: 'Amara Weerasinghe', email: 'amara@example.com', role: 'Teacher', status: 'Active' },
-  { id: 102, name: 'Dinuka Rajapaksha', email: 'dinuka@example.com', role: 'Student', status: 'Banned' },
-  { id: 103, name: 'Saman Kumara', email: 'saman@example.com', role: 'Student', status: 'Active' },
-];
+const UserManagement = ({ users = [], onBan, onUnban }) => {
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
 
-const UserManagement = ({ onBan, onUnban }) => {
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name?.toLowerCase().includes(search.toLowerCase()) || user.email?.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+
   return (
     <div className="user-management">
       <div className="admin-toolbar">
         <div className="search-input-wrapper admin-search">
           <Search size={18} />
-          <input type="text" className="search-input" placeholder="Search users by name or email..." />
+          <input 
+            type="text" 
+            className="search-input" 
+            placeholder="Search users by name or email..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        <select className="filter-select">
+        <select 
+          className="filter-select" 
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
           <option value="all">All Roles</option>
           <option value="teacher">Teachers</option>
-          <option value="student">Students</option>
+          <option value="learner">Learners</option>
         </select>
       </div>
       
@@ -34,18 +47,18 @@ const UserManagement = ({ onBan, onUnban }) => {
             </tr>
           </thead>
           <tbody>
-            {mockUsers.map((user) => (
-              <tr key={user.id}>
+            {filteredUsers.map((user) => (
+              <tr key={user.uid || user.id}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td><span className={`role-badge ${user.role.toLowerCase()}`}>{user.role}</span></td>
+                <td><span className={`role-badge ${user.role?.toLowerCase() || 'learner'}`}>{user.role || 'Learner'}</span></td>
                 <td>
-                  <span className={`status-badge ${user.status.toLowerCase()}`}>
-                    {user.status}
+                  <span className={`status-badge ${(user.status || 'Active').toLowerCase()}`}>
+                    {user.status || 'Active'}
                   </span>
                 </td>
                 <td>
-                  {user.status === 'Active' ? (
+                  {(user.status || 'Active') !== 'Banned' ? (
                     <button onClick={() => onBan(user)} className="btn-sm btn-danger-outline" title="Ban User">
                       <ShieldAlert size={14} /> Ban
                     </button>
@@ -57,6 +70,11 @@ const UserManagement = ({ onBan, onUnban }) => {
                 </td>
               </tr>
             ))}
+            {filteredUsers.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center no-data">No users found</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

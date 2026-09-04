@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VerificationQueue from '../components/admin/VerificationQueue';
 import UserManagement from '../components/admin/UserManagement';
 import AdminModal from '../components/admin/AdminModal';
 import { Users, FileCheck, Shield, Database, Lock, LogIn, AlertCircle, LogOut } from 'lucide-react';
 import { seedInitialMentors } from '../firebase/seedDb';
-import { isFirebaseConfigured } from '../firebase/config';
+import { db, isFirebaseConfigured } from '../firebase/config';
 import { useAuth } from '../firebase/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const AdminDashboard = () => {
   const { isLoggedIn, isAdmin, loading, login, logout } = useAuth();
@@ -21,6 +21,34 @@ const AdminDashboard = () => {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Live Data states
+  const [allUsers, setAllUsers] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
+
+  const fetchUsers = async () => {
+    if (!isFirebaseConfigured || !db) return;
+    setLoadingData(true);
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const usersList = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      setAllUsers(usersList);
+    } catch (err) {
+      console.error('Failed to fetch users', err);
+    }
+    setLoadingData(false);
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchUsers();
+    }
+  }, [isAdmin]);
+
+  // Derived stats
+  const pendingQueue = allUsers.filter(u => u.status === 'Pending' || (u.role === 'teacher' && !u.isVerified && (!u.status || u.status === 'Pending')));
+  const activeUsersCount = allUsers.filter(u => (u.status || 'Active') !== 'Banned').length;
+  const bannedUsersCount = allUsers.filter(u => u.status === 'Banned').length;
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -127,9 +155,12 @@ const AdminDashboard = () => {
       description: `Are you sure you want to approve the ID verification for ${user.name}? They will receive a VERIFIED badge.`,
       confirmText: 'Approve',
       type: 'success',
-      onConfirm: () => {
-        console.log('Approved', user.id);
+      onConfirm: async () => {
         setModalConfig({ isOpen: false });
+        if (isFirebaseConfigured && db) {
+           await updateDoc(doc(db, 'users', user.uid), { status: 'Active', isVerified: true });
+           fetchUsers();
+        }
       }
     });
   };
@@ -141,9 +172,12 @@ const AdminDashboard = () => {
       description: `Are you sure you want to reject the ID verification for ${user.name}? This action cannot be undone.`,
       confirmText: 'Reject',
       type: 'danger',
-      onConfirm: () => {
-        console.log('Rejected', user.id);
+      onConfirm: async () => {
         setModalConfig({ isOpen: false });
+        if (isFirebaseConfigured && db) {
+           await updateDoc(doc(db, 'users', user.uid), { status: 'Rejected', isVerified: false });
+           fetchUsers();
+        }
       }
     });
   };
@@ -156,9 +190,12 @@ const AdminDashboard = () => {
       description: `Are you sure you want to ban ${user.name}? They will lose access to the platform immediately.`,
       confirmText: 'Ban User',
       type: 'danger',
-      onConfirm: () => {
-        console.log('Banned', user.id);
+      onConfirm: async () => {
         setModalConfig({ isOpen: false });
+        if (isFirebaseConfigured && db) {
+           await updateDoc(doc(db, 'users', user.uid), { status: 'Banned' });
+           fetchUsers();
+        }
       }
     });
   };
@@ -170,9 +207,12 @@ const AdminDashboard = () => {
       description: `Are you sure you want to restore access for ${user.name}?`,
       confirmText: 'Unban User',
       type: 'success',
-      onConfirm: () => {
-        console.log('Unbanned', user.id);
+      onConfirm: async () => {
         setModalConfig({ isOpen: false });
+        if (isFirebaseConfigured && db) {
+           await updateDoc(doc(db, 'users', user.uid), { status: 'Active' });
+           fetchUsers();
+        }
       }
     });
   };
@@ -188,21 +228,21 @@ const AdminDashboard = () => {
         <div className="stat-card glass-card">
           <FileCheck size={28} className="stat-icon primary-text" />
           <div className="stat-info">
-            <h3>2</h3>
+            <h3>{loadingData ? '-' : pendingQueue.length}</h3>
             <p>Pending Verifications</p>
           </div>
         </div>
         <div className="stat-card glass-card">
           <Users size={28} className="stat-icon secondary-text" />
           <div className="stat-info">
-            <h3>1,248</h3>
+            <h3>{loadingData ? '-' : activeUsersCount}</h3>
             <p>Total Active Users</p>
           </div>
         </div>
         <div className="stat-card glass-card">
           <Shield size={28} className="stat-icon warning-text" />
           <div className="stat-info">
-            <h3>12</h3>
+            <h3>{loadingData ? '-' : bannedUsersCount}</h3>
             <p>Banned Accounts</p>
           </div>
         </div>
@@ -245,10 +285,10 @@ const AdminDashboard = () => {
 
         <div className="admin-tab-content">
           {activeTab === 'verification' && (
-            <VerificationQueue onApprove={handleApprove} onReject={handleReject} />
+            <VerificationQueue queue={pendingQueue} onApprove={handleApprove} onReject={handleReject} />
           )}
           {activeTab === 'users' && (
-            <UserManagement onBan={handleBan} onUnban={handleUnban} />
+            <UserManagement users={allUsers} onBan={handleBan} onUnban={handleUnban} />
           )}
         </div>
       </div>
