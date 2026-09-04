@@ -19,8 +19,8 @@
 > **Change this to YOUR assigned role before starting work.**
 
 ```
-ROLE = "UNASSIGNED"
-MEMBER_NAME = "Your Name Here"
+ROLE = "ROLE_3"
+MEMBER_NAME = "Jegajeevan"
 ```
 
 ### Role Options:
@@ -37,7 +37,7 @@ MEMBER_NAME = "Your Name Here"
 |--------|-----------|------|------------------------|
 | Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md` |
 | Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*` |
-| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/firebase/*`, `src/App.jsx` |
+| Jegajeevan | IT24102883 | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Auth.jsx`, `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/firebase/*`, `src/App.jsx` |
 | Member 4 | IT________ | `ROLE_4_TESTING_DEPLOYMENT` | `vite.config.js`, `package.json`, `vercel.json`, `.gitignore`, deployment configs |
 
 > **Update the table above** with actual names and student IDs after pulling.
@@ -131,11 +131,14 @@ e-pedia/
 - [ ] Ensure responsive design works on mobile & desktop
 
 ### ROLE_3: Functional Implementation
-- [ ] Set up Firebase in `config.js`
+- [ ] Implement Authentication & Registration (Email/Password with Firebase Auth & session persistence)
+- [ ] Implement Dual User Types (Learner & Teacher/Mentor) and Role Management
+- [ ] Implement User Profile & Verification Credentials (Student ID, Lecturer ID, Teaching Level: Beginner/Intermediate/Expert)
+- [ ] Set up Firebase in `config.js` (Auth & Firestore)
 - [ ] Build `Explore.jsx` (search, filter, display mentors)
-- [ ] Build `TeachForm.jsx` (registration form with full validation)
+- [ ] Build `TeachForm.jsx` (registration form with full validation & Firestore persistence)
 - [ ] Set up routing in `App.jsx`
-- [ ] Implement data persistence (Firestore CRUD)
+- [ ] Implement data persistence (Firestore CRUD & offline fallback)
 - [ ] Input validation with friendly error messages
 
 ### ROLE_4: Testing, Git & Deployment
