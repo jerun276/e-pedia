@@ -273,7 +273,7 @@ function Auth() {
   }
 
   return (
-    <main className="form-page" id="auth-page" style={{ minHeight: 'calc(100vh - 80px)', padding: '40px 16px' }}>
+    <main className="form-page" id="auth-page" style={{ minHeight: 'calc(100vh - 80px)', paddingTop: 'calc(var(--nav-height) + 40px)', paddingBottom: '60px' }}>
       <div className="container" style={{ maxWidth: '560px', margin: '0 auto' }}>
         
         {/* Header */}

@@ -139,7 +139,7 @@ function AiQuiz() {
   }
 
   return (
-    <main className="ai-quiz-page" id="ai-quiz-page" style={{ padding: '60px 0', minHeight: '85vh' }}>
+    <main className="ai-quiz-page" id="ai-quiz-page" style={{ paddingTop: 'calc(var(--nav-height) + 40px)', paddingBottom: '60px', minHeight: '85vh' }}>
       <div className="container" style={{ maxWidth: '900px' }}>
         
         {/* HEADER */}

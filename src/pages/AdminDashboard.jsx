@@ -70,7 +70,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="admin-dashboard container section">
+    <div className="admin-dashboard container section" style={{ paddingTop: 'calc(var(--nav-height) + 40px)' }}>
       <div className="admin-header">
         <h1 className="section-title">Admin <span className="gradient-text">Control Panel</span></h1>
         <p className="section-subtitle">Manage user verifications and platform security</p>
