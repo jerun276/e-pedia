@@ -17,11 +17,13 @@ function Messages() {
   const [newMessage, setNewMessage] = useState('')
   const [loadingChats, setLoadingChats] = useState(true)
   
-  const messagesEndRef = useRef(null)
+  const messagesContainerRef = useRef(null)
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom of the chat container when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+    }
   }, [messages])
 
   // Listen to user's chats
@@ -250,7 +252,7 @@ function Messages() {
               </div>
 
               {/* Chat Messages */}
-              <div style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div ref={messagesContainerRef} style={{ flex: 1, padding: '24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {messages.length === 0 ? (
                   <div style={{ textAlign: 'center', color: 'var(--text-secondary)', marginTop: 'auto', marginBottom: 'auto' }}>
                     Say hello to start the conversation!
@@ -275,7 +277,6 @@ function Messages() {
                     )
                   })
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Chat Input */}
