@@ -19,8 +19,8 @@
 > **Change this to YOUR assigned role before starting work.**
 
 ```
-ROLE = "UNASSIGNED"
-MEMBER_NAME = "Your Name Here"
+ROLE = "ROLE_2"
+MEMBER_NAME = "Visakithan"
 ```
 
 ### Role Options:
@@ -36,8 +36,8 @@ MEMBER_NAME = "Your Name Here"
 | Member | Student ID | Role | Owned Files/Directories |
 |--------|-----------|------|------------------------|
 | Member 1 | IT________ | `ROLE_1_PROBLEM_SOLUTION` | `src/pages/Home.jsx`, `src/pages/About.jsx`, `src/data/sampleData.js`, `README.md` |
-| Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*` |
-| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/firebase/*`, `src/App.jsx` |
+| Member 2 | IT________ | `ROLE_2_UI_DEVELOPMENT` | `src/components/*`, `src/index.css`, `src/pages/Profile.jsx`, `public/*`, `src/components/admin/*` |
+| Member 3 | IT________ | `ROLE_3_FUNCTIONAL_IMPLEMENTATION` | `src/pages/Explore.jsx`, `src/pages/TeachForm.jsx`, `src/pages/AdminDashboard.jsx`, `src/firebase/*`, `src/App.jsx` |
 | Member 4 | IT________ | `ROLE_4_TESTING_DEPLOYMENT` | `vite.config.js`, `package.json`, `vercel.json`, `.gitignore`, deployment configs |
 
 > **Update the table above** with actual names and student IDs after pulling.
@@ -66,13 +66,15 @@ e-pedia/
 │   │   ├── Navbar.jsx
 │   │   ├── Footer.jsx
 │   │   ├── SkillCard.jsx
-│   │   └── SearchBar.jsx
+│   │   ├── SearchBar.jsx
+│   │   └── admin/              # Admin UI components (ROLE_2)
 │   ├── pages/                  # Page components
 │   │   ├── Home.jsx            # (ROLE_1)
 │   │   ├── Explore.jsx         # (ROLE_3)
 │   │   ├── TeachForm.jsx       # (ROLE_3)
 │   │   ├── About.jsx           # (ROLE_1)
-│   │   └── Profile.jsx         # (ROLE_2)
+│   │   ├── Profile.jsx         # (ROLE_2)
+│   │   └── AdminDashboard.jsx  # (ROLE_3)
 │   ├── firebase/               # Firebase config (ROLE_3)
 │   │   └── config.js
 │   ├── data/                   # Sample data (ROLE_1)
@@ -127,6 +129,7 @@ e-pedia/
 - [ ] Build `SkillCard.jsx` (mentor card with avatar, badges, description)
 - [ ] Build `SearchBar.jsx` component
 - [ ] Build `Profile.jsx` page (mentor detail view)
+- [ ] Build Admin Panel UI components (Verification Queue table, Modals in `src/components/admin/`)
 - [ ] Polish `index.css` (responsive design, animations, glassmorphism)
 - [ ] Ensure responsive design works on mobile & desktop
 
@@ -134,8 +137,9 @@ e-pedia/
 - [ ] Set up Firebase in `config.js`
 - [ ] Build `Explore.jsx` (search, filter, display mentors)
 - [ ] Build `TeachForm.jsx` (registration form with full validation)
+- [ ] Build `AdminDashboard.jsx` (User ID Verification Management, Security & Content Moderation)
 - [ ] Set up routing in `App.jsx`
-- [ ] Implement data persistence (Firestore CRUD)
+- [ ] Implement data persistence and Platform CRUD Operations (Firestore)
 - [ ] Input validation with friendly error messages
 
 ### ROLE_4: Testing, Git & Deployment
