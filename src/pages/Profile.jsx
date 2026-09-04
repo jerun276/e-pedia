@@ -134,7 +134,7 @@ function Profile() {
                 <ArrowLeft size={16} /> Back
               </button>
 
-              <div className="profile-header-card glass-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+              <div className="profile-header-card glass-card" style={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '48px 24px' }}>
                 <div 
                   className="profile-avatar"
                   style={{
