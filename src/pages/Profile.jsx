@@ -1,23 +1,87 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { AlertCircle, Award, ArrowLeft, BadgeCheck, CheckCircle, MapPin, Send, Star, Users, Clock, Mail, Phone, MessageCircle, X } from 'lucide-react'
 import { sampleMentors } from '../data/sampleData'
+import { db, isFirebaseConfigured } from '../firebase/config'
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
 
 function Profile() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const mentor = sampleMentors.find(m => m.id === id)
+  
+  const [mentor, setMentor] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const findMentor = async () => {
+      // 1. Check sampleMentors
+      let found = sampleMentors.find(m => m.id === id)
+      
+      // 2. Check localStorage
+      if (!found) {
+        try {
+          const stored = localStorage.getItem('epedia_custom_mentors')
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            found = parsed.find(m => m.id === id || m.uid === id)
+          }
+        } catch (e) {
+          console.warn('Error reading cached mentors:', e)
+        }
+      }
+      
+      // 3. Check Firestore
+      if (!found && isFirebaseConfigured && db) {
+        try {
+          const docRef = doc(db, 'mentors', id)
+          const docSnap = await getDoc(docRef)
+          if (docSnap.exists()) {
+            found = { id: docSnap.id, ...docSnap.data() }
+          } else {
+            const snapshot = await getDocs(collection(db, 'mentors'))
+            const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+            found = docs.find(m => m.id === id || m.uid === id)
+          }
+        } catch (e) {
+          console.warn('Firestore fetch mentor warning:', e.message)
+        }
+      }
+      
+      setMentor(found || null)
+      setLoading(false)
+    }
+    
+    findMentor()
+  }, [id])
+
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [contactSent, setContactSent] = useState(false)
   const [contactData, setContactData] = useState({ name: '', email: '', message: '' })
   const [contactErrors, setContactErrors] = useState({})
-  const [reviews, setReviews] = useState(() => {
-    if (!mentor) return []
-    const savedReviews = localStorage.getItem(`e-pedia-reviews-${mentor.id}`)
-    return savedReviews ? JSON.parse(savedReviews) : []
-  })
+  
+  const [reviews, setReviews] = useState([])
+  
+  useEffect(() => {
+    if (mentor) {
+      const savedReviews = localStorage.getItem(`e-pedia-reviews-${mentor.id}`)
+      if (savedReviews) {
+        setReviews(JSON.parse(savedReviews))
+      }
+    }
+  }, [mentor])
+
   const [reviewData, setReviewData] = useState({ name: '', rating: 0, comment: '' })
   const [reviewError, setReviewError] = useState('')
+
+  if (loading) {
+    return (
+      <main className="profile-page">
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }}>
+          <div className="spinner"></div>
+        </div>
+      </main>
+    )
+  }
 
   if (!mentor) {
     return (
