@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../firebase/AuthContext'
 import { 
   Menu, X, Sparkles, LogIn, LogOut, User, 
-  GraduationCap, ShieldCheck, BookOpen, ChevronDown, CheckCircle
+  GraduationCap, ShieldCheck, BookOpen, ChevronDown, CheckCircle, MessageCircle
 } from 'lucide-react'
 
 function Navbar() {
