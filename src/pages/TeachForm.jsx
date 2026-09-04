@@ -23,8 +23,12 @@ function TeachForm() {
     availability: [],
     contactMethod: '',
   })
+  
+  const [isAlreadyMentor, setIsAlreadyMentor] = useState(false)
+  const [existingMentorId, setExistingMentorId] = useState(null)
+  const [checkingMentor, setCheckingMentor] = useState(true)
 
-  // Auto pre-fill if authenticated as a teacher or user
+  // Auto pre-fill if authenticated as a teacher or user, and check if already registered
   useEffect(() => {
     if (userProfile) {
       setFormData(prev => ({
@@ -35,6 +39,42 @@ function TeachForm() {
         category: prev.category || userProfile.skillCategory || '',
         district: prev.district || userProfile.district || ''
       }))
+      
+      // Check if this user is already in the mentors DB
+      const checkExistingMentor = async () => {
+        try {
+          // Check local storage first (for immediate feedback if just registered)
+          const existingRaw = localStorage.getItem('epedia_custom_mentors')
+          if (existingRaw) {
+            const existingMentors = JSON.parse(existingRaw)
+            const match = existingMentors.find(m => m.email === userProfile.email)
+            if (match) {
+              setIsAlreadyMentor(true)
+              setExistingMentorId(match.id)
+              setCheckingMentor(false)
+              return
+            }
+          }
+          
+          // Check Firestore
+          if (isFirebaseConfigured && db) {
+            const { getDocs, query, where, collection } = await import('firebase/firestore')
+            const q = query(collection(db, 'mentors'), where('email', '==', userProfile.email))
+            const snap = await getDocs(q)
+            if (!snap.empty) {
+              setIsAlreadyMentor(true)
+              setExistingMentorId(snap.docs[0].id)
+            }
+          }
+        } catch (err) {
+          console.warn("Failed to check existing mentor status", err)
+        }
+        setCheckingMentor(false)
+      }
+      
+      checkExistingMentor()
+    } else {
+      setCheckingMentor(false)
     }
   }, [userProfile])
 
@@ -176,6 +216,38 @@ function TeachForm() {
 
   const availabilityOptions = ['Weekdays', 'Weekends', 'Evenings']
   const contactMethods = ['Email', 'Phone', 'WhatsApp']
+
+  if (checkingMentor) {
+    return (
+      <main className="form-page" id="teach-form-page">
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div className="spinner"></div>
+        </div>
+      </main>
+    )
+  }
+
+  if (isAlreadyMentor) {
+    return (
+      <main className="form-page" id="teach-form-page">
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <div className="form-card glass-card" style={{ textAlign: 'center', padding: '40px', maxWidth: '500px' }}>
+            <div style={{ display: 'inline-flex', padding: '16px', borderRadius: '50%', background: 'rgba(0, 212, 170, 0.15)', color: 'var(--secondary)', marginBottom: '16px' }}>
+              <CheckCircle size={48} />
+            </div>
+            <h2 style={{ marginBottom: '16px' }}>You're Already a Mentor!</h2>
+            <p className="text-secondary" style={{ marginBottom: '24px' }}>
+              Your mentor profile is live and active on E-Pedia. Learners can discover your classes and book sessions with you.
+            </p>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <Link to="/explore" className="btn btn-outline">Explore Mentors</Link>
+              <Link to={`/profile/${existingMentorId}`} className="btn btn-primary">View My Profile</Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="form-page" id="teach-form-page">
